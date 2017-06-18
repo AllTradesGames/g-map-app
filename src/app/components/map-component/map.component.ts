@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { } from '@types/googlemaps';
 
+import { Pin } from '../../models';
+
 @Component({
   selector: 'map-component',
   templateUrl: './map.component.html',
@@ -13,6 +15,8 @@ export class MapComponent implements OnInit {
   map: google.maps.Map;
   latLong: google.maps.LatLng = new google.maps.LatLng(39.5501, -105.7821);
   geocodeResults: google.maps.GeocoderResult[];
+
+  isCreatingPin: boolean;
 
   constructor() { }
 
@@ -50,5 +54,8 @@ export class MapComponent implements OnInit {
           window.alert('No results found');
         }
   }
+
+
+
 
 }
