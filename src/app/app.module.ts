@@ -1,8 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpModule, JsonpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { MapComponent } from './components';
+import { GoogleMapsGeocodingService } from './services';
 
 @NgModule({
   declarations: [
@@ -10,9 +12,13 @@ import { MapComponent } from './components';
     MapComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpModule,
+    JsonpModule
   ],
-  providers: [],
+  providers: [
+    GoogleMapsGeocodingService
+    ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
