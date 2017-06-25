@@ -62,3 +62,714 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+
+
+
+
+
+
+th
+{
+    text-align: left;
+}
+
+.header-logo-area 
+{
+    height: 60px;
+    min-width: 260px;
+    background-color: #00b2ee;
+}
+
+.header-area
+{
+    height: 60px;
+    background-color: #5e7388;
+}
+
+.header-area ul
+{
+    margin: 0;
+}
+.header-area li
+{
+    height: 100%;
+    padding: 0;
+}
+.header-area div
+{
+    text-align: center;
+    display:inline-block;
+    padding: 15px;
+}
+.header-area a:hover, a:active 
+{
+    color: #00b2ee;
+    transition: color 0.25s;
+}
+
+    
+.header-text
+{
+    color: #ffffff;
+    font: normal 14px "Roboto";
+    text-decoration:none;
+    padding: 0;
+    margin: 0;
+}
+
+.ui-menu-item
+{
+   height: 57px;
+   display: block;
+   text-decoration:none;
+   background-color: #ffffff; 
+   color: #5e7388;
+   font: bold 15px "Roboto";
+   transition: background-color 0.5s;
+}
+
+.ui-menu
+{
+    vertical-align: middle !important;
+}
+
+.ui-menu-item a
+{
+    height: 100%;
+    padding-left: 35px;
+    padding-right: 30px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 4px;   
+}
+.ui-menu-item a div
+{
+    padding-top: 7px;
+    
+}
+.ui-menu-item a span
+{
+    vertical-align: middle;
+    margin-top: 14px;
+    margin-bottom: 14px;
+}
+
+.ui-state-focus
+{
+    color: #00b2ee !important;
+    background-color: #eaf2f6 !important;
+    transition: background-color 0.25s;
+}
+
+.ui-datepicker
+{
+    background-color: #00b2ee;
+    color: #fff;
+    border: 1px solid #cedae7;
+    border-radius: 5px;
+    font-family: roboto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.ui-datepicker thead
+{
+    border-collapse: separate;
+    background-color: #fff;
+    color: #00b2ee;
+}
+
+a, a:hover, a:active {
+    text-decoration: none;
+    color: inherit;
+    /*text-align: inherit;*/
+    border-collapse: inherit;
+}
+
+.window-section, fieldset
+{
+    margin: 0;
+    margin-bottom: 20px;
+    border: 1px solid #cedae7;
+    border-radius: 5px;
+    background-color: #ffffff;
+    width: 980px;
+}
+.window-section-top, legend
+{
+    background-color: #e6edf4;
+    border-bottom: 1px solid #cedae7;
+    padding: 10px 20px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.window-section-bottom, fieldset
+{
+    padding: 20px;
+    font: normal 15px "Roboto";
+    color: #5e7387;
+}
+.window-section-header, .fc-header-title h2, strong
+{
+    color: #5e7387;
+    font: bold 25px "Roboto";
+    border: none;
+    margin: 0;
+    /*width: 250px;*/
+    max-width: 100%;
+    display: inline-block;
+    padding-top: 10px;
+}
+legend
+{
+    -moz-padding-start: 40px;
+    -moz-padding-end: 0;
+    -padding-start: 40px;
+    -padding-end: 0;
+    width: 100%;
+    border: 1px solid #cedae7;
+    color: #5e7387;
+    font: bold 18px "Roboto";
+    float: left;
+    position: relative;
+    left: -21px;
+    top: -21px;
+    padding-left: 20px;
+}
+fieldset
+{
+    /*margin-top: -20px;*/
+    margin-left: 0;
+    margin-right: 0;
+}
+.expanding
+{
+    max-height: 0px;
+    height: auto;
+    overflow: hidden;
+    transition: max-height 2s;
+    transition-delay: 10s;
+    margin-bottom: 3px;
+}
+.expanding-legend
+{
+    background-color: #00b2ee;
+    color: #ffffff;
+    transition: background-color 1s, color 1s;
+    transition-delay: 11.5s;
+}
+.expanding-legend:hover, .expanding-legend:active, .expanding-legend:focus
+{
+    background-color: #e6edf4;
+    color: #5e7387;
+    transition: background-color 0.25s, color 0.25s;
+    transition-delay: 0s;
+}
+.expanding:hover, .expanding:active, .expanding:focus
+{
+    max-height: 4000px;
+    transition-delay: 0s;
+}
+
+.window-section-header-mid
+{
+    color: #5e7387;
+    font: bold 18px "Roboto";
+    border: none;
+    margin: 0;
+    width: 250px;
+    display: inline-block;
+}
+.window-section-bottom h3,  .h3
+{
+    margin-bottom: 10px;
+    display: inline-block;
+    font: normal 16px "Roboto";
+    color: #5e7387;
+}
+.sub-title
+{
+    font: normal 11px "Roboto";
+    color: #5e7387;
+}
+
+.ws-label 
+{
+    text-align: left;
+    padding: 10px 100px 20px 5px;
+    width: 200px;
+    
+}
+
+.ws-content
+{
+    float: right;
+}
+
+.ws-table
+{
+    position: relative;
+}
+.ws-table, .ws-table tbody
+{
+    font: normal 14px "Roboto";
+    color: #5e7387;
+    border: none;
+    border-radius: 5px;
+}
+.ws-table td
+{
+    padding: 0 10px !important;
+    border: none;
+    height: 40px;
+    text-align: left;
+}
+.ws-table-customers td span
+{
+    padding: 0px 5px !important;
+}
+.ws-table-column th 
+{
+    font-size: 18px !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-bottom: 2px solid #6D8499 !important;
+    border-right: 2px solid #6D8499 !important;
+    width: 100% !important;
+    border-bottom-right-radius: 5px !important; 
+}
+.ws-table th 
+{
+    border: none;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border-right: 1px solid #cedae7;
+    max-width: 100%;
+    height: 40px;
+    text-align: center;
+    padding: 0px 5px 0px 5px;
+}
+.ws-table-customers td input[type="image"] 
+{
+    position: absolute;
+    top: 47px;
+    right: 15px;
+}
+.ws-table tbody tr td table 
+{
+}
+
+.check-box label
+{
+    height: 100%;
+    width: 100%;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.fc-header-title h2
+{
+    font-size: 35px;
+    padding-top: 0;
+    padding-bottom: 15px;
+}
+
+input[type="checkbox"] 
+{
+ vertical-align: middle;
+ -webkit-appearance:none;/* Hides the default checkbox style */ 
+ height:23px;
+ width:23px;
+ cursor:pointer;
+ position:relative;
+ -webkit-transition: .15s;
+ border-radius:3px;
+ border: 2px solid #6D8499;
+ background-color:#fff;
+}
+input[type="checkbox"]:checked {
+ background-color:rgb(104, 182, 106);
+ border: none;
+}
+input[type="checkbox"]:before, input[type="checkbox"]:checked:before {
+ position:absolute;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ line-height:2em;
+ text-align:center;
+ color:#fff;
+ /*content: '✘';*/
+}
+input[type="checkbox"]:checked:before {
+ content: '✔';
+}
+input[type="checkbox"]:hover:before {
+ background:rgba(255,255,255,0.3);
+}
+input[type="checkbox"]:focus {
+ outline: none;
+}
+input[type="checkbox"]:hover {
+ border-color: #00b2ee;
+}
+
+input[type="radio"] 
+{
+ vertical-align: middle;
+ height:20px;
+ width:20px;
+ -webkit-appearance: none;/* Hides the default style */ 
+ cursor:pointer;
+ -webkit-transition: .15s;
+ border: 2px solid #e6edf4;
+ border-radius: 10px;
+ background-color:#fff;
+}
+input[type="radio"]::before {
+  display: block;
+  position: absolute;
+	content: '';
+  border-radius: 100%;
+  height: 15px;
+  width: 15px;
+  top: 5px;
+	left: 5px;
+  margin: auto;
+	transition: background 0.25s linear;
+	-webkit-transition: background 0.25s linear;
+}
+
+input[type="radio"]:checked {
+  border: 6px solid #00b2ee;
+}
+
+input[type="radio"]::before{
+  background: #00b2ee;
+}
+input[type="radio"]:focus
+{
+    outline: none;
+}
+input[type="radio"]:hover
+{
+    border-color: #00b2ee;
+}
+
+input[type="text"], input[type="password"] 
+{
+    border: 2px #dbe9f0;
+    border-radius: 5px;
+    border-style: solid;
+    padding: 5px 10px;
+    font: bold 14px "Roboto";
+    color: #5e7387;
+    /*width: 200px;*/
+    height: 27px;
+}
+input[type="text"]:active, input[type="text"]:focus, input[type="text"]:hover, input[type="password"]:active, input[type="password"]:focus, input[type="password"]:hover 
+{
+    border: solid 2px;
+    border-radius: 5px;
+    border-color: #00b2ee;
+}
+
+textarea 
+{
+    border: 2px #dbe9f0;
+    border-radius: 5px;
+    border-style: solid;
+    padding: 5px 10px;
+    font: bold 16px "Roboto";
+    color: #5e7387;
+    max-width: 100%;
+    height: 27px;
+}
+textarea:active, textarea:focus, textarea:hover 
+{
+    border: solid 2px;
+    border-radius: 5px;
+    border-color: #00b2ee;
+}
+
+select
+{
+    border: 2px #dbe9f0;
+    border-radius: 5px;
+    border-style: solid;
+    padding: 5px 20px 5px 10px;
+    font: bold 14px "Roboto";
+    color: #5e7387;
+    /*width: 200px;*/
+    height: 40px;
+}
+select:active, select:focus, select:hover
+{
+    border: solid 2px;
+    border-radius: 5px;
+    border-color: #00b2ee;
+    outline: none;
+}
+select option /* Doesn't seem to work in chrome */
+{
+    border-radius: 5px;
+    border: none;
+    font: bold 14px "Roboto";
+    color: #5e7387;
+    width: 100%;
+    height: 40px;
+    padding: 5px 10px;
+    outline: none;
+}
+
+input.aspNetDisabled
+{
+    background-color: #cedae7 !important;
+    cursor: default !important;
+}
+button.aspNetDisabled
+{
+    background-color: #cedae7 !important;
+    cursor: default !important;
+}
+.button-gray
+{
+    color: #5e7387;
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    background-color: #dbe9f0;
+    border-radius: 5px;
+    height: 40px;
+    padding: 0px 20px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    transition: background-color 0.25s;
+    cursor: pointer;
+}
+.button-gray:hover
+{
+    background-color: #cedae7;
+    transition: background-color 0.25s;
+}
+.button-blue
+{
+    color: #ffffff;
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    background-color: #00b2ee;
+    border-radius: 5px;
+    height: 40px;
+    padding: 0px 20px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    transition: background-color 0.25s;
+    cursor: pointer;
+}
+.button-blue:hover
+{
+    background-color: #0e96c4;
+    transition: background-color 0.25s;
+}
+.button-green
+{
+    color: #ffffff;
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    background-color: #68b66a;
+    border-radius: 5px;
+    height: 40px;
+    padding: 0px 20px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    transition: background-color 0.25s;
+    cursor: pointer;
+}
+.button-green:hover
+{
+    background-color: #4b9b4d;
+    transition: background-color 0.25s;
+}
+.button-red
+{
+    color: #ffffff;
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    background-color: #f25a5a;
+    border-radius: 5px;
+    height: 40px;
+    padding: 0px 20px;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    transition: background-color 0.25s;
+    cursor: pointer;
+}
+.button-red:hover
+{
+    background-color: #ee2b2b;
+    transition: background-color 0.25s;
+}
+.button-white
+{
+    color: #00b2ee;
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    background-color: #ffffff;
+    border: 1px;
+    border-style: dashed;
+    border-color: #00b2ee;
+    border-radius: 5px;
+    height: 40px;
+    padding: 0px 20px;
+    text-align: center;
+    vertical-align: middle;
+    transition: background-color 0.25s;
+    transition: color 0.25s;
+    cursor: pointer;
+}
+.button-white:hover
+{
+    color: #ffffff;
+    background-color: #00b2ee;
+    transition: background-color 0.25s;
+    transition: color 0.25s;
+}
+
+.fc-button
+{
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    background-color: #ffffff !important;
+    height: 40px !important;
+    text-align: center;
+    vertical-align: middle !important;
+    transition: background-color 0.25s;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    cursor: pointer;
+}
+.fc-state-hover
+{
+    background-color: #eaf2f6 !important;
+    transition: background-color 0.25s !important;
+}
+.fc-state-default
+{
+    color: #00b2ee !important;
+    transition: background 0.25s !important;
+}
+.fc-state-disabled, .fc-state-active
+{
+    color: #cedae7 !important;
+    transition: background 0.25s !important;
+}
+.fc-state-down
+{
+    background-color: #B1C2D0 !important;
+    transition: background-color 0.25s !important;
+}
+
+.fc-day-header
+{
+    border-top-right-radius: 5px !important;
+    border-top-left-radius: 5px !important;
+}
+
+.fc-day-number, .fc-day-header, .fc-event-title
+{
+    font-family: "Roboto" !important;
+}
+
+
+/* Used to include font ligature icons */
+[data-icon]::before {
+  content: attr(data-icon);
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+   
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.link-text:hover
+{
+    color: #00b2ee;
+    cursor: pointer;
+}
+
+.text-icon
+{
+    font-size: 30px;
+    padding: 20px 10px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    transition: color 0.25s;
+}
+
+.tab-list
+{
+    background-color: #00b2ee;
+    max-width: 1500px;
+    border-radius: 7px;
+    color: #ffffff;
+    font: normal 14px "Roboto";
+    text-transform: uppercase;
+    height: 40px;
+    vertical-align: middle !important;
+    border: none;
+    transition: background-color 0.25s;
+    cursor: pointer;
+}
+.tab-list li
+{
+    height: 100%;
+    display:inline-block;
+    text-decoration:none;
+}
+.tab-list a:hover
+{
+    background-color: #0e96c4;
+    transition: background-color 0.25s;
+}
+.tab-list li:selected
+{
+    background-color: #0e96c4;
+    transition: background-color 0.25s;
+}
+.tab-list a
+{
+    height: 100%;
+    width: 100%;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 7px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

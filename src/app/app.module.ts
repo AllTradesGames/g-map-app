@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { HttpModule, JsonpModule } from '@angular/http';
 
@@ -14,7 +15,8 @@ import { GoogleMapsGeocodingService } from './services';
   imports: [
     BrowserModule,
     HttpModule,
-    JsonpModule
+    JsonpModule,
+    FormsModule
   ],
   providers: [
     GoogleMapsGeocodingService

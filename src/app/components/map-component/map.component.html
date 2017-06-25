@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <style>
-      input:checked{
-        margin-top: 100px;
-        }
-      </style>
   </head>
   <body>
     <div id="map"></div>
     <input type="button" value="Use Geocode" (click)="useGeocode()">
     <label class="switch">
-    <input type="checkbox" [(ngModel)]="isCreatingPin" name="Toggle" (change)="onSliderChanged()">
+    <input type="checkbox" [(ngModel)]="this.isCreatingPin" (ngModelChange)="onSliderChange()">
     <div class="slider round"></div>
     </label>
   </body>
