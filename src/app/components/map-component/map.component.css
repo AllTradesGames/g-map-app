@@ -63,12 +63,6 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-
-
-
-
-
-
 th
 {
     text-align: left;
@@ -554,7 +548,7 @@ button.aspNetDisabled
     background-color: #cedae7;
     transition: background-color 0.25s;
 }
-.button-blue
+.buttonblue
 {
     color: #ffffff;
     font: normal 14px "Roboto";
@@ -569,7 +563,7 @@ button.aspNetDisabled
     transition: background-color 0.25s;
     cursor: pointer;
 }
-.button-blue:hover
+.buttonblue:hover
 {
     background-color: #0e96c4;
     transition: background-color 0.25s;
@@ -578,13 +572,13 @@ button.aspNetDisabled
 {
     color: #ffffff;
     font: normal 14px "Roboto";
-    text-transform: uppercase;
+    text-transform: none;
     background-color: #68b66a;
     border-radius: 5px;
     height: 40px;
     padding: 0px 20px;
     text-align: center;
-    vertical-align: middle;
+    vertical-align: center;
     border: none;
     transition: background-color 0.25s;
     cursor: pointer;
@@ -773,3 +767,32 @@ button.aspNetDisabled
     border-radius: 7px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+#placesSearch-panel {
+        position: absolute;
+        top: 10px;
+        left: 35%;
+        right: 35%;
+        z-index: 5;
+        background-color: transparent;
+        padding: 5px;
+        border: 0px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+#newMarker-panel {
+        position: absolute;
+        top: 10px;
+        right: 2%;
+        z-index: 5;
+        background-color: transparent;
+        padding: 5px;
+        border: 0px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }

@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>
+    </title>
   </head>
   <body>
+    <div id="placesSearch-panel">
+      <input id="address" [(ngModel)]="address" type="textbox" value="Auburn, CA">
+      <input type="submit" value="Search" (click)="codeAddress()">
+    </div>
     <div id="map"></div>
-    <input type="button" value="Use Geocode" (click)="useGeocode()">
-    <label class="switch">
-    <input type="checkbox" [(ngModel)]="this.isCreatingPin" (ngModelChange)="onSliderChange()">
-    <div class="slider round"></div>
-    </label>
+    <div id="newMarker-panel">
+      <label class="switch">
+      <input type="checkbox" [(ngModel)]="this.isCreatingPin" (ngModelChange)="onSliderChange()">
+      <div class="slider round"></div>
+      </label>Create New Pin
+    </div>
   </body>
 </html>

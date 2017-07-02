@@ -11,32 +11,35 @@ import { Pin } from '../../models';
 })
 export class MapComponent implements OnInit {
 
-  // geocoder: google.maps.Geocoder;
+  geocoder: google.maps.Geocoder;
   // infowindow: google.maps.InfoWindow;
   map: google.maps.Map;
   latLong: google.maps.LatLng = new google.maps.LatLng(39.5501, -105.7821);
-  // geocodeResults: google.maps.GeocoderResult[];
+  geocodeResults: google.maps.GeocoderResult[];
   isCreatingPin: boolean;
+  saveMarkerData: boolean;
   markers: google.maps.Marker[];
   newMarkerInfoWindowContent: string;
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
-  markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();;
+  markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
+  address: string;
+
 
   constructor() { }
 
   ngOnInit() {
     this.isCreatingPin = false;
-    // this.geocoder = new google.maps.Geocoder();
+    this.geocoder = new google.maps.Geocoder();
     // this.infowindow = new google.maps.InfoWindow();
     this.map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 11,
+      zoom: 5,
       center: this.latLong
     });
     var thisRef = this;
-    this.map.addListener('click', function ($event) {
+    this.map.addListener('click', function ($mapClick) {
       console.log("map was clicked");
-      thisRef.onMapClick($event);
+      thisRef.onMapClick($mapClick);
     });
 
     /*this.geocoder.geocode({ 'location': this.latLong }, (results, status) => {
@@ -56,7 +59,7 @@ export class MapComponent implements OnInit {
   initEasyDataMarkers(){
     // TODO load Activities and Dispositions from EASYDATATRACKER
     this.markers = new Array<google.maps.Marker>();
-  }
+  } 
 
   useGeocode() {
     console.log("useGeocode()");
@@ -74,13 +77,20 @@ export class MapComponent implements OnInit {
     }*/
   }
 
-  onMapClick($event) {
-    console.log($event);
+  onMapClick($mapClick) {
+    console.log($mapClick);
     if (this.isCreatingPin == true) {
-      this.createNewPin($event.latLng.lat(), $event.latLng.lng());
+      this.createNewPin($mapClick.latLng.lat(), $mapClick.latLng.lng());
+      this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
+      if (status.toString() === 'OK') {
+        this.geocodeResults = results;
+        console.log(results);
+      } else {
+        window.alert('Geocoder failed due to: ' + status);
+      }
+    });
       this.isCreatingPin = false;
     }
-
   }
 
   onSliderChange() {
@@ -94,7 +104,7 @@ export class MapComponent implements OnInit {
         map: this.map
     }));
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
-    this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length-1])
+    this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length-1]);
   }
 
   initInfoWindowContent()
@@ -102,12 +112,15 @@ export class MapComponent implements OnInit {
     this.newMarkerInfoWindowContent = `
     <div>
       <input #newMarkerName type="text" placeholder="Name">
-      <input type="text" placeholder="Address">
+      <input type="text" placeholder="Address" id="formattedAddress">
       <input type="text" placeholder="Phone Number">
       <input type="text" placeholder="Email (optional)">
     </div>
     <div>
-      <input type="button" value="Save">
+      <button _ngcontent-c1 class="button-green">Save</button>
+      <button _ngcontent-c1 class="button-green">Call</button>
+      <button _ngcontent-c1 class="button-green">Email</button>
+      <button _ngcontent-c1 class="button-green">Cancel</button>
     </div>
     `;
 
@@ -121,4 +134,36 @@ export class MapComponent implements OnInit {
     `;
   }
 
+/*
+Notes for Zach
+Add places autocomplete for a choice of places based on keywords
+When typing the address, we should be able to use the enter button on the keyboard
+The markers shouldnt stay unless you hit save
+The cancel button will delete the marker and close the info window at the same time
+Zoom is clumsy, could be a variable for easier use
+When you close the info window, the pin toggle should go back to true for quicker use
+ */
+
+   codeAddress() {
+    var address = document.getElementById('address');
+    this.geocoder.geocode( { 'address': this.address}, (results, status) => {
+      if (status.toString() ==='OK'){
+        this.geocodeResults = results;
+        console.log(results);
+        this.map.setCenter(results[0].geometry.location);
+        this.map.setZoom(11);
+        this.markers.push(new google.maps.Marker({
+            map: this.map,
+            position: results[0].geometry.location
+        }));
+        this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
+        this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length-1]);
+      }
+      
+      else
+      {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+   }
 }
