@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { } from '@types/googlemaps';
 import { FormsModule } from '@angular/forms';
 
@@ -9,7 +9,7 @@ import { Pin } from '../../models';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, AfterViewInit {
 
   // geocoder: google.maps.Geocoder;
   // infowindow: google.maps.InfoWindow;
@@ -51,6 +51,22 @@ export class MapComponent implements OnInit {
     this.initInfoWindowContent();
     this.initEasyDataMarkers();
 
+  }
+
+  ngAfterViewInit() {
+    var thisRef = this;
+    window.addEventListener('message', thisRef.handleParentMessages, false); 
+    window.parent.postMessage({
+      "eventType": "AppLoaded"
+    }, '*');
+  }
+
+  handleParentMessages(event){
+    switch (event.data.eventType) {
+                case "InitialData":
+                    console.log(event.data.data);
+                    break;
+            }
   }
 
   initEasyDataMarkers(){
