@@ -1,7 +1,6 @@
 export interface Activity {
     ownerName: string;
-    contactFirstName: string;
-    contactLastName: string;
+    contactName: string;
     leadType: string;
     status: ActivityStatus;
     dispositionName: string;
