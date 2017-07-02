@@ -127,12 +127,41 @@ export class MapComponent implements OnInit, AfterViewInit {
       position: latLong,
       map: this.map
     }));
+    this.newMarkerWindowContent();
+  }
+
+  codeAddress() {
+    var address = document.getElementById('address');
+    this.geocoder.geocode({ 'address': this.address }, (results, status) => {
+      if (status.toString() === 'OK') {
+        this.geocodeResults = results;
+        console.log(results);
+        this.map.setCenter(results[0].geometry.location);
+        this.map.setZoom(11);
+        if (this.isCreatingPin) {
+          this.markers.push(new google.maps.Marker({
+            position: results[0].geometry.location,
+            map: this.map
+          }));
+          this.newMarkerWindowContent();
+        }
+      }
+      else {
+        window.alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  }
+
+ newMarkerWindowContent(){
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
     var thisRef = this;
     document.getElementById("newMarkerSave").addEventListener("click", function () {
       thisRef.newMarkerSave();
     });
+    var newMarkerAddress: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
+    newMarkerAddress.value = thisRef.address;
+    console.log(newMarkerAddress.value);
     google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
       thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
       thisRef.markers.pop(); //removes the marker from array
@@ -143,7 +172,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.newMarkerInfoWindowContent = `
     <div>
       <input _ngcontent-c1 id="newMarkerName" type="text" placeholder="Name">
-      <input _ngcontent-c1 id="newMarkerAddress" type="text" placeholder="Address">
+      <input _ngcontent-c1 id="newMarkerAddress" type="text" placeholder="Address" value="">
       <input _ngcontent-c1 id="newMarkerPhone" type="text" placeholder="Phone Number">
       <input _ngcontent-c1 id="newMarkerEmail" type="text" placeholder="Email (optional)">
     </div>
@@ -182,40 +211,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   Add places autocomplete for a choice of places based on keywords
   When typing the address, we should be able to use the enter button on the keyboard
   The markers shouldnt stay unless you hit save
-  The cancel button will delete the marker and close the info window at the same time
   Zoom is clumsy, could be a variable for easier use
   When you close the info window, the pin toggle should go back to true for quicker use
    */
-
-  codeAddress() {
-    var address = document.getElementById('address');
-    this.geocoder.geocode({ 'address': this.address }, (results, status) => {
-      if (status.toString() === 'OK') {
-        this.geocodeResults = results;
-        console.log(results);
-        this.map.setCenter(results[0].geometry.location);
-        this.map.setZoom(11);
-        if (this.isCreatingPin) {
-          this.markers.push(new google.maps.Marker({
-            map: this.map,
-            position: results[0].geometry.location
-          }));
-          this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
-          this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
-          var thisRef = this;
-          google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
-            thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
-            thisRef.markers.pop(); //removes the marker from array
-          });
-
-          // TODO prefill new marker address field
-
-        }
-      }
-
-      else {
-        alert('Geocode was not successful for the following reason: ' + status);
-      }
-    });
-  }
 }
