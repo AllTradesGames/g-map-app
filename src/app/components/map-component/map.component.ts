@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { } from '@types/googlemaps';
 import { FormsModule } from '@angular/forms';
 
-import { Pin } from '../../models';
+import { Pin, Activity, Disposition } from '../../models';
 
 @Component({
   selector: 'map-component',
@@ -19,11 +19,15 @@ export class MapComponent implements OnInit, AfterViewInit {
   isCreatingPin: boolean;
   saveMarkerData: boolean;
   markers: google.maps.Marker[];
+  activities: Activity[];
   newMarkerInfoWindowContent: string;
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   address: string;
+
+  newMarkerAddress: string;
+
 
 
   constructor() { }
@@ -42,15 +46,6 @@ export class MapComponent implements OnInit, AfterViewInit {
       thisRef.onMapClick($mapClick);
     });
 
-    /*this.geocoder.geocode({ 'location': this.latLong }, (results, status) => {
-      if (status.toString() === 'OK') {
-        this.geocodeResults = results;
-        console.log(results);
-      } else {
-        window.alert('Geocoder failed due to: ' + status);
-      }
-    });*/
-
     this.initInfoWindowContent();
     this.initEasyDataMarkers();
 
@@ -58,27 +53,40 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     var thisRef = this;
-    window.addEventListener('message', thisRef.handleParentMessages, false); 
+    window.addEventListener('message', thisRef.handleParentMessages, false);
     window.parent.postMessage({
       "eventType": "AppLoaded"
     }, '*');
+
   }
 
-  handleParentMessages(event){
+  handleParentMessages(event) {
     switch (event.data.eventType) {
-                case "InitialData":
-                    console.log(event.data.data);
-                    break;
-            }
+      case "InitialData":
+        console.log(event.data.data);
+        break;
+    }
   }
 
-  initEasyDataMarkers(){
+  initEasyDataMarkers() {
     // TODO load Activities and Dispositions from EASYDATATRACKER
     this.markers = new Array<google.maps.Marker>();
-  } 
+  }
 
   useGeocode() {
     console.log("useGeocode()");
+
+    /*this.geocoder.geocode({ 'location': this.latLong }, (results, status) => {
+          if (status.toString() === 'OK') {
+            this.geocodeResults = results;
+            console.log(results);
+          } else {
+            window.alert('Geocoder failed due to: ' + status);
+          }
+        });*/
+
+
+
     /*if (this.geocodeResults[1]) {
       this.map.setZoom(11);
       this.map.setCenter(this.latLong);
@@ -98,13 +106,13 @@ export class MapComponent implements OnInit, AfterViewInit {
     if (this.isCreatingPin == true) {
       this.createNewPin($mapClick.latLng.lat(), $mapClick.latLng.lng());
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
-      if (status.toString() === 'OK') {
-        this.geocodeResults = results;
-        console.log(results);
-      } else {
-        window.alert('Geocoder failed due to: ' + status);
-      }
-    });
+        if (status.toString() === 'OK') {
+          this.geocodeResults = results;
+          console.log(results);
+        } else {
+          window.alert('Geocoder failed due to: ' + status);
+        }
+      });
       this.isCreatingPin = false;
     }
   }
@@ -116,27 +124,31 @@ export class MapComponent implements OnInit, AfterViewInit {
   createNewPin(inputLat: number, inputLng: number) {
     var latLong = new google.maps.LatLng(inputLat, inputLng);
     this.markers.push(new google.maps.Marker({
-        position: latLong,
-        map: this.map
+      position: latLong,
+      map: this.map
     }));
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
-    this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length-1]);
+    this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
+    var thisRef = this;
+    document.getElementById("newMarkerSave").addEventListener("click", function () {
+      thisRef.newMarkerSave();
+    });
+    google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
+      thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
+      thisRef.markers.pop(); //removes the marker from array
+    });
   }
 
-  initInfoWindowContent()
-  {
+  initInfoWindowContent() {
     this.newMarkerInfoWindowContent = `
     <div>
-      <input #newMarkerName type="text" placeholder="Name">
-      <input type="text" placeholder="Address" id="formattedAddress">
-      <input type="text" placeholder="Phone Number">
-      <input type="text" placeholder="Email (optional)">
+      <input _ngcontent-c1 id="newMarkerName" type="text" placeholder="Name">
+      <input _ngcontent-c1 id="newMarkerAddress" type="text" placeholder="Address">
+      <input _ngcontent-c1 id="newMarkerPhone" type="text" placeholder="Phone Number">
+      <input _ngcontent-c1 id="newMarkerEmail" type="text" placeholder="Email (optional)">
     </div>
     <div>
-      <button _ngcontent-c1 class="button-green">Save</button>
-      <button _ngcontent-c1 class="button-green">Call</button>
-      <button _ngcontent-c1 class="button-green">Email</button>
-      <button _ngcontent-c1 class="button-green">Cancel</button>
+      <button _ngcontent-c1 class="button-green" id="newMarkerSave">Save</button>
     </div>
     `;
 
@@ -150,36 +162,60 @@ export class MapComponent implements OnInit, AfterViewInit {
     `;
   }
 
-/*
-Notes for Zach
-Add places autocomplete for a choice of places based on keywords
-When typing the address, we should be able to use the enter button on the keyboard
-The markers shouldnt stay unless you hit save
-The cancel button will delete the marker and close the info window at the same time
-Zoom is clumsy, could be a variable for easier use
-When you close the info window, the pin toggle should go back to true for quicker use
- */
+  newMarkerSave() {
+    var name: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
+    console.log(name.value);
 
-   codeAddress() {
+    // TODO Add the new Marker to the markers array
+
+
+    // TODO Add a new Activity to the activities array
+
+
+    // TODO Clear the new marker content
+
+    // TODO Push the newest activity to the EasyDataTracker side
+  }
+
+  /*
+  Notes for Zach
+  Add places autocomplete for a choice of places based on keywords
+  When typing the address, we should be able to use the enter button on the keyboard
+  The markers shouldnt stay unless you hit save
+  The cancel button will delete the marker and close the info window at the same time
+  Zoom is clumsy, could be a variable for easier use
+  When you close the info window, the pin toggle should go back to true for quicker use
+   */
+
+  codeAddress() {
     var address = document.getElementById('address');
-    this.geocoder.geocode( { 'address': this.address}, (results, status) => {
-      if (status.toString() ==='OK'){
+    this.geocoder.geocode({ 'address': this.address }, (results, status) => {
+      if (status.toString() === 'OK') {
         this.geocodeResults = results;
         console.log(results);
         this.map.setCenter(results[0].geometry.location);
         this.map.setZoom(11);
-        this.markers.push(new google.maps.Marker({
+        if (this.isCreatingPin) {
+          this.markers.push(new google.maps.Marker({
             map: this.map,
             position: results[0].geometry.location
-        }));
-        this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
-        this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length-1]);
+          }));
+          this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
+          this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
+          var thisRef = this;
+          google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
+            thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
+            thisRef.markers.pop(); //removes the marker from array
+          });
+
+          // TODO prefill new marker address field
+
+        }
       }
-      
-      else
-      {
+
+      else {
         alert('Geocode was not successful for the following reason: ' + status);
       }
     });
-   }
+  }
 }

@@ -548,7 +548,7 @@ button.aspNetDisabled
     background-color: #cedae7;
     transition: background-color 0.25s;
 }
-.buttonblue
+.button-blue
 {
     color: #ffffff;
     font: normal 14px "Roboto";
@@ -563,7 +563,7 @@ button.aspNetDisabled
     transition: background-color 0.25s;
     cursor: pointer;
 }
-.buttonblue:hover
+.button-blue:hover
 {
     background-color: #0e96c4;
     transition: background-color 0.25s;

@@ -6,8 +6,8 @@
   </head>
   <body>
     <div id="placesSearch-panel">
-      <input id="address" [(ngModel)]="address" type="textbox" value="Auburn, CA">
-      <input type="submit" value="Search" (click)="codeAddress()">
+      <input id="address" [(ngModel)]="address" type="textbox">
+      <input type="submit" value="Search" (click)="codeAddress()" class="button-blue">
     </div>
     <div id="map"></div>
     <div id="newMarker-panel">
