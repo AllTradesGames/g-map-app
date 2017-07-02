@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { } from '@types/googlemaps';
 import { FormsModule } from '@angular/forms';
 
-import { Pin, Activity, Disposition } from '../../models';
+import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../../models';
 
 @Component({
   selector: 'map-component',
