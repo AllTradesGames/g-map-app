@@ -6,15 +6,15 @@
   </head>
   <body>
     <div id="placesSearch-panel">
-      <input id="address" [(ngModel)]="address" type="text" placeholder="Search . . .">
-      <input type="submit" value="Search" (click)="codeAddress()" class="button-blue">
+      <input id="address" title="GeocodeSearchTextBox" [(ngModel)]="address" type="text" placeholder="Search . . .">
+      <button title="MarkerName" value="Search" (click)="codeAddress()" class="button-blue"><i class="material-icons md-48">search</i></button>
     </div>
     <div id="map"></div>
     <div id="newMarker-panel">
       <label class="switch">
       <input type="checkbox" [(ngModel)]="this.isCreatingPin" (ngModelChange)="onSliderChange()">
       <div class="slider round"></div>
-      </label>Create New Pin
+      </label><i class="material-icons">location_on</i>
     </div>
   </body>
 </html>

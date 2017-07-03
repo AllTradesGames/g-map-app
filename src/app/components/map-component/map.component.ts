@@ -45,10 +45,8 @@ export class MapComponent implements OnInit, AfterViewInit {
       console.log("map was clicked");
       thisRef.onMapClick($mapClick);
     });
-
     this.initInfoWindowContent();
     this.initEasyDataMarkers();
-
   }
 
   ngAfterViewInit() {
@@ -160,7 +158,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       thisRef.newMarkerSave();
     });
     var newMarkerAddress: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
-    newMarkerAddress.value = thisRef.address;
+    newMarkerAddress.value = thisRef.geocodeResults[0].formatted_address;
     console.log(newMarkerAddress.value);
     google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
       thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
@@ -171,13 +169,13 @@ export class MapComponent implements OnInit, AfterViewInit {
   initInfoWindowContent() {
     this.newMarkerInfoWindowContent = `
     <div>
-      <input _ngcontent-c1 id="newMarkerName" type="text" placeholder="Name">
-      <input _ngcontent-c1 id="newMarkerAddress" type="text" placeholder="Address" value="">
-      <input _ngcontent-c1 id="newMarkerPhone" type="text" placeholder="Phone Number">
-      <input _ngcontent-c1 id="newMarkerEmail" type="text" placeholder="Email (optional)">
+      <input _ngcontent-c1 id="newMarkerName" title="MarkerName" type="text" placeholder="Name">
+      <input _ngcontent-c1 id="newMarkerAddress" title="MarkerAddress" type="text" placeholder="Address" value="">
+      <input _ngcontent-c1 id="newMarkerPhone" title="MarkerPhoneNumber" type="text" placeholder="Phone Number">
+      <input _ngcontent-c1 id="newMarkerEmail" title="MarkerEmail" type="text" placeholder="Email (optional)">
     </div>
     <div>
-      <button _ngcontent-c1 class="button-green" id="newMarkerSave">Save</button>
+      <button _ngcontent-c1 class="button-green" title="MarkerSave" id="newMarkerSave"><i class="material-icons">save</i></button>
     </div>
     `;
 
@@ -205,13 +203,4 @@ export class MapComponent implements OnInit, AfterViewInit {
 
     // TODO Push the newest activity to the EasyDataTracker side
   }
-
-  /*
-  Notes for Zach
-  Add places autocomplete for a choice of places based on keywords
-  When typing the address, we should be able to use the enter button on the keyboard
-  The markers shouldnt stay unless you hit save
-  Zoom is clumsy, could be a variable for easier use
-  When you close the info window, the pin toggle should go back to true for quicker use
-   */
 }
