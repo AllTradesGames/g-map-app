@@ -13,7 +13,6 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   loggedInUser: User;
   geocoder: google.maps.Geocoder;
-  // infowindow: google.maps.InfoWindow;
   map: google.maps.Map;
   latLong: google.maps.LatLng = new google.maps.LatLng(39.5501, -105.7821);
   isCreatingPin: boolean;
@@ -30,20 +29,24 @@ export class MapComponent implements OnInit, AfterViewInit {
   constructor() { }
 
   ngOnInit() {
+    // Initialize google maps vars
     this.isCreatingPin = false;
     this.geocoder = new google.maps.Geocoder();
-    // this.infowindow = new google.maps.InfoWindow();
     this.map = new google.maps.Map(document.getElementById('map'), {
       zoom: 5,
       center: this.latLong
     });
     var thisRef = this;
+
+    // Add a click listener to the map
     this.map.addListener('click', function ($mapClick) {
-      //console.log("map was clicked");
       thisRef.onMapClick($mapClick);
     });
+    // Set the info window html content vars
     this.initInfoWindowContent();
+    // Load and create markers from EasyDataTracker
     this.initEasyDataMarkers();
+    // Load logged in user info from EasyDataTracker
     this.loggedInUser = this.getLoggedInUser();
   }
 
@@ -108,8 +111,11 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
 
-  onSliderChange() {
-    //console.log(this.isCreatingPin);
+  keypressEvent(event) {
+    var key = event.which || event.keyCode;
+    if (key === 13) { // 13 is enter
+      this.codeAddress();
+    }    
   }
 
 
@@ -118,7 +124,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.newMarkerAddress = searchBoxEl.value;
     this.geocoder.geocode({ 'address': this.newMarkerAddress }, (results, status) => {
       if (status.toString() === 'OK') {
-        //console.log(results);
+        searchBoxEl.value = results[0].formatted_address;
         this.newMarkerAddress = results[0].formatted_address;
         this.map.setCenter(results[0].geometry.location);
         // TODO make this zoom value dynamic based on the closest geocode result
@@ -147,7 +153,6 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
     var newMarkerAddressEl: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
     newMarkerAddressEl.value = thisRef.newMarkerAddress;
-    //console.log(newMarkerAddress.value);
     google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
       thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
       thisRef.markers.pop(); //removes the marker from array
