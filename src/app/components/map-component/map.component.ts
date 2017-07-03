@@ -16,7 +16,6 @@ export class MapComponent implements OnInit, AfterViewInit {
   // infowindow: google.maps.InfoWindow;
   map: google.maps.Map;
   latLong: google.maps.LatLng = new google.maps.LatLng(39.5501, -105.7821);
-  geocodeResults: google.maps.GeocoderResult[];
   isCreatingPin: boolean;
   saveMarkerData: boolean;
   markers: google.maps.Marker[] = [];
@@ -25,11 +24,8 @@ export class MapComponent implements OnInit, AfterViewInit {
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
-  address: string;
 
   newMarkerAddress: string;
-
-
 
   constructor() { }
 
@@ -51,6 +47,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.loggedInUser = this.getLoggedInUser();
   }
 
+
   ngAfterViewInit() {
     var thisRef = this;
     window.addEventListener('message', thisRef.handleParentMessages, false);
@@ -59,6 +56,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     }, '*');
 
   }
+
 
   getLoggedInUser(): User {
     // TODO grab real info from EASYDATATRACKER
@@ -74,6 +72,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     return user;
   }
 
+
   handleParentMessages(event) {
     switch (event.data.eventType) {
       case "InitialData":
@@ -82,45 +81,24 @@ export class MapComponent implements OnInit, AfterViewInit {
     console.log("PARENT_MESSAGE: " + event.data.eventType);
   }
 
+
   initEasyDataMarkers() {
     // TODO load Activities and Dispositions from EASYDATATRACKER
     this.markers = new Array<google.maps.Marker>();
   }
 
-  useGeocode() {
-    /*this.geocoder.geocode({ 'location': this.latLong }, (results, status) => {
-          if (status.toString() === 'OK') {
-            this.geocodeResults = results;
-            console.log(results);
-          } else {
-            window.alert('Geocoder failed due to: ' + status);
-          }
-        });*/
-
-
-
-    /*if (this.geocodeResults[1]) {
-      this.map.setZoom(11);
-      this.map.setCenter(this.latLong);
-      var marker = new google.maps.Marker({
-        position: this.latLong,
-        map: this.map
-      });
-      this.infowindow.setContent(this.geocodeResults[1].formatted_address);
-      this.infowindow.open(this.map, marker);
-    } else {
-      window.alert('No results found');
-    }*/
-  }
 
   onMapClick($mapClick) {
-    //console.log($mapClick);
     if (this.isCreatingPin == true) {
-      this.createNewPin($mapClick.latLng.lat(), $mapClick.latLng.lng());
+      var latLong = new google.maps.LatLng($mapClick.latLng.lat(), $mapClick.latLng.lng());
+      this.markers.push(new google.maps.Marker({
+        position: latLong,
+        map: this.map
+      }));
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
         if (status.toString() === 'OK') {
-          this.geocodeResults = results;
-          //console.log(results);
+          this.newMarkerAddress = results[0].formatted_address;
+          this.newMarkerWindowContent();
         } else {
           window.alert('Geocoder failed due to: ' + status);
         }
@@ -129,26 +107,21 @@ export class MapComponent implements OnInit, AfterViewInit {
     }
   }
 
+
   onSliderChange() {
     //console.log(this.isCreatingPin);
   }
 
-  createNewPin(inputLat: number, inputLng: number) {
-    var latLong = new google.maps.LatLng(inputLat, inputLng);
-    this.markers.push(new google.maps.Marker({
-      position: latLong,
-      map: this.map
-    }));
-    this.newMarkerWindowContent();
-  }
 
   codeAddress() {
-    var address = document.getElementById('address');
-    this.geocoder.geocode({ 'address': this.address }, (results, status) => {
+    var searchBoxEl: HTMLInputElement = <HTMLInputElement>document.getElementById("search-box");
+    this.newMarkerAddress = searchBoxEl.value;
+    this.geocoder.geocode({ 'address': this.newMarkerAddress }, (results, status) => {
       if (status.toString() === 'OK') {
-        this.geocodeResults = results;
         //console.log(results);
+        this.newMarkerAddress = results[0].formatted_address;
         this.map.setCenter(results[0].geometry.location);
+        // TODO make this zoom value dynamic based on the closest geocode result
         this.map.setZoom(11);
         if (this.isCreatingPin) {
           this.markers.push(new google.maps.Marker({
@@ -164,6 +137,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
   }
 
+
   newMarkerWindowContent() {
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
@@ -171,14 +145,15 @@ export class MapComponent implements OnInit, AfterViewInit {
     document.getElementById("newMarkerSave").addEventListener("click", function () {
       thisRef.newMarkerSave();
     });
-    var newMarkerAddress: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
-    newMarkerAddress.value = thisRef.address;
+    var newMarkerAddressEl: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
+    newMarkerAddressEl.value = thisRef.newMarkerAddress;
     //console.log(newMarkerAddress.value);
     google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
       thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
       thisRef.markers.pop(); //removes the marker from array
     });
   }
+
 
   initInfoWindowContent() {
     this.newMarkerInfoWindowContent = `
@@ -203,6 +178,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     `;
   }
 
+
   newMarkerSave() {
     var nameField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
     var addressField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
@@ -225,4 +201,6 @@ export class MapComponent implements OnInit, AfterViewInit {
 
     // TODO Push the newest activity to the EasyDataTracker side
   }
+
+
 }
