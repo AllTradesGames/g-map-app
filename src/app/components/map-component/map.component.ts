@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { } from '@types/googlemaps';
 import { FormsModule } from '@angular/forms';
 
-import { Pin, Activity, Disposition } from '../../models';
+import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../../models';
 
 @Component({
   selector: 'map-component',
@@ -11,6 +11,7 @@ import { Pin, Activity, Disposition } from '../../models';
 })
 export class MapComponent implements OnInit, AfterViewInit {
 
+  loggedInUser: User;
   geocoder: google.maps.Geocoder;
   // infowindow: google.maps.InfoWindow;
   map: google.maps.Map;
@@ -18,8 +19,8 @@ export class MapComponent implements OnInit, AfterViewInit {
   geocodeResults: google.maps.GeocoderResult[];
   isCreatingPin: boolean;
   saveMarkerData: boolean;
-  markers: google.maps.Marker[];
-  activities: Activity[];
+  markers: google.maps.Marker[] = [];
+  activities: Activity[] = [];
   newMarkerInfoWindowContent: string;
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
@@ -42,11 +43,12 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
     var thisRef = this;
     this.map.addListener('click', function ($mapClick) {
-      console.log("map was clicked");
+      //console.log("map was clicked");
       thisRef.onMapClick($mapClick);
     });
     this.initInfoWindowContent();
     this.initEasyDataMarkers();
+    this.loggedInUser = this.getLoggedInUser();
   }
 
   ngAfterViewInit() {
@@ -58,12 +60,26 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   }
 
+  getLoggedInUser(): User {
+    // TODO grab real info from EASYDATATRACKER
+    var user = {
+      status: UserStatus.ENABLED,
+      logonName: "testUser",
+      permissions: [{
+        id: 0,
+        name: "testPermission",
+        sysPermission: true
+      }]
+    };
+    return user;
+  }
+
   handleParentMessages(event) {
     switch (event.data.eventType) {
       case "InitialData":
-        console.log(event.data.data);
         break;
     }
+    console.log("PARENT_MESSAGE: " + event.data.eventType);
   }
 
   initEasyDataMarkers() {
@@ -72,8 +88,6 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   useGeocode() {
-    console.log("useGeocode()");
-
     /*this.geocoder.geocode({ 'location': this.latLong }, (results, status) => {
           if (status.toString() === 'OK') {
             this.geocodeResults = results;
@@ -100,13 +114,13 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   onMapClick($mapClick) {
-    console.log($mapClick);
+    //console.log($mapClick);
     if (this.isCreatingPin == true) {
       this.createNewPin($mapClick.latLng.lat(), $mapClick.latLng.lng());
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
         if (status.toString() === 'OK') {
           this.geocodeResults = results;
-          console.log(results);
+          //console.log(results);
         } else {
           window.alert('Geocoder failed due to: ' + status);
         }
@@ -116,7 +130,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   onSliderChange() {
-    console.log(this.isCreatingPin);
+    //console.log(this.isCreatingPin);
   }
 
   createNewPin(inputLat: number, inputLng: number) {
@@ -133,7 +147,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.geocoder.geocode({ 'address': this.address }, (results, status) => {
       if (status.toString() === 'OK') {
         this.geocodeResults = results;
-        console.log(results);
+        //console.log(results);
         this.map.setCenter(results[0].geometry.location);
         this.map.setZoom(11);
         if (this.isCreatingPin) {
@@ -150,7 +164,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
   }
 
- newMarkerWindowContent(){
+  newMarkerWindowContent() {
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
     var thisRef = this;
@@ -158,8 +172,8 @@ export class MapComponent implements OnInit, AfterViewInit {
       thisRef.newMarkerSave();
     });
     var newMarkerAddress: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
-    newMarkerAddress.value = thisRef.geocodeResults[0].formatted_address;
-    console.log(newMarkerAddress.value);
+    newMarkerAddress.value = thisRef.address;
+    //console.log(newMarkerAddress.value);
     google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
       thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
       thisRef.markers.pop(); //removes the marker from array
@@ -190,16 +204,24 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   newMarkerSave() {
-    var name: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
-    console.log(name.value);
+    var nameField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
+    var addressField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
+    var phoneField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerPhone");
+    var emailField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerEmail");
 
-    // TODO Add the new Marker to the markers array
+    // Add a new Activity to the activities array
+    this.activities.push({
+      ownerName: this.loggedInUser.logonName,
+      contactName: nameField.value,
+      leadType: "testLead",
+      status: ActivityStatus.LEAD,
+      dispositionName: "testDisposition"
+    });
+    //console.log(this.activities[this.activities.length - 1])
 
-
-    // TODO Add a new Activity to the activities array
-
-
-    // TODO Clear the new marker content
+    // Clear the new marker content
+    this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
+    this.newMarkerInfowindow.close();
 
     // TODO Push the newest activity to the EasyDataTracker side
   }
