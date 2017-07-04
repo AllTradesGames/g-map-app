@@ -23,8 +23,9 @@ export class MapComponent implements OnInit, AfterViewInit {
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
-
+  markerBeachFlag = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
   newMarkerAddress: string;
+  markerAddress: string;
 
   constructor() { }
 
@@ -49,6 +50,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     // Load logged in user info from EasyDataTracker
     this.loggedInUser = this.getLoggedInUser();
   }
+  
 
 
   ngAfterViewInit() {
@@ -96,7 +98,9 @@ export class MapComponent implements OnInit, AfterViewInit {
       var latLong = new google.maps.LatLng($mapClick.latLng.lat(), $mapClick.latLng.lng());
       this.markers.push(new google.maps.Marker({
         position: latLong,
-        map: this.map
+        map: this.map,
+        icon: this.markerBeachFlag,
+        animation: google.maps.Animation.DROP,
       }));
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
         if (status.toString() === 'OK') {
@@ -109,7 +113,6 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.isCreatingPin = false;
     }
   }
-
 
   keypressEvent(event) {
     var key = event.which || event.keyCode;
@@ -159,26 +162,24 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
   }
 
-
   initInfoWindowContent() {
     this.newMarkerInfoWindowContent = `
     <div>
-      <input _ngcontent-c1 id="newMarkerName" title="MarkerName" type="text" placeholder="Name">
-      <input _ngcontent-c1 id="newMarkerAddress" title="MarkerAddress" type="text" placeholder="Address" value="">
-      <input _ngcontent-c1 id="newMarkerPhone" title="MarkerPhoneNumber" type="text" placeholder="Phone Number">
-      <input _ngcontent-c1 id="newMarkerEmail" title="MarkerEmail" type="text" placeholder="Email (optional)">
+      <input _ngcontent-c1 id="newMarkerName" title="New Customer Name" type="text" placeholder="Name">
+      <input _ngcontent-c1 id="newMarkerAddress" title="New Customer Address" type="text" placeholder="Address" value="">
+      <input _ngcontent-c1 id="newMarkerPhone" title="New Customer Phone Number" type="text" placeholder="Phone Number">
+      <input _ngcontent-c1 id="newMarkerEmail" title="New Customer Email Address" type="text" placeholder="Email (optional)">
     </div>
     <div>
-      <button _ngcontent-c1 class="button-green" title="MarkerSave" id="newMarkerSave"><i class="material-icons">save</i></button>
+      <button _ngcontent-c1 class="button-blue" title="Save" id="newMarkerSave"><i class="material-icons">save</i></button>
     </div>
     `;
 
     this.markerInfoWindowContent = `
-    <p>Marker Info Window</p>
     <div>
-      <input type="button" value="test1">
-      <input type="button" value="test2">
-      <input type="button" value="test3">
+     <button _ngcontent-c1 class="button-blue" title="Open Directions" id="openExternalMaps"><i class="material-icons">navigation</i></button>
+     <button _ngcontent-c1 class="button-blue" title="Disposition Info" id="dispositionInfo"><i class="material-icons">people</i></button>
+     <button _ngcontent-c1 class="button-blue" title="Call Customer" id="callCustomer"><i class="material-icons">phone_iphone</i></button>
     </div>
     `;
   }
@@ -203,9 +204,33 @@ export class MapComponent implements OnInit, AfterViewInit {
     // Clear the new marker content
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.close();
+    this.lastSavedMarkerWindow();
 
     // TODO Push the newest activity to the EasyDataTracker side
   }
 
+  openExternalMaps(){
+    console.log("Set a default application for opening maps");
+  }
+  dispositionInfo(){
+    console.log("The Disposition window has not yet been set");
+  }
+  callCustomer(){
+    console.log("Set a default application for making phone calls");
+  }
 
+  lastSavedMarkerWindow(){
+    this.markerInfowindow.setContent(this.markerInfoWindowContent);
+    this.markerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
+    var thisRef = this;
+    document.getElementById("openExternalMaps").addEventListener("click", function () {
+      thisRef.openExternalMaps();
+    });
+     document.getElementById("dispositionInfo").addEventListener("click", function () {
+      thisRef.dispositionInfo();
+    });
+     document.getElementById("callCustomer").addEventListener("click", function () {
+      thisRef.callCustomer();
+    });
+  }
 }

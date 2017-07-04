@@ -41,11 +41,11 @@
 }
 
 input:checked + .slider {
-  background-color: #2196F1;
+  background-color: #00b2ee;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px #00b2ee;
 }
 
 input:checked + .slider:before {
@@ -771,8 +771,8 @@ button.aspNetDisabled
 #placesSearch-panel {
         position: absolute;
         top: 10px;
-        left: 35%;
-        right: 35%;
+        left: 18%;
+        right: 16%;
         z-index: 5;
         background-color: transparent;
         padding: 5px;
