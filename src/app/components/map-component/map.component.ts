@@ -115,7 +115,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     var key = event.which || event.keyCode;
     if (key === 13) { // 13 is enter
       this.codeAddress();
-    }    
+    }
   }
 
 
@@ -192,11 +192,17 @@ export class MapComponent implements OnInit, AfterViewInit {
 
     // Add a new Activity to the activities array
     this.activities.push({
+      id: -1,
       ownerName: this.loggedInUser.logonName,
       contactName: nameField.value,
+      contactAddress: addressField.value,
+      contactEmail: emailField.value,
+      contactPhones: [phoneField.value],
       leadType: "testLead",
       status: ActivityStatus.LEAD,
-      dispositionName: "testDisposition"
+      dispositionName: "testDisposition",
+      dispositionColor: "000000",
+      notes: ""
     });
     //console.log(this.activities[this.activities.length - 1])
 
