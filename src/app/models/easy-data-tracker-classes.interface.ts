@@ -1,9 +1,15 @@
 export interface Activity {
+    id: number;
     ownerName: string;
     contactName: string;
+    contactAddress: string;
+    contactEmail: string;
+    contactPhones: string[];
     leadType: string;
     status: ActivityStatus;
     dispositionName: string;
+    dispositionColor: string;
+    notes: string;
 }
 
 export interface User {
