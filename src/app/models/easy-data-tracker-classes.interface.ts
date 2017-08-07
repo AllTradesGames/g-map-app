@@ -10,6 +10,7 @@ export interface Activity {
     dispositionName: string;
     dispositionColor: string;
     notes: string;
+    latLng: google.maps.LatLng;
 }
 
 export interface User {
@@ -27,14 +28,14 @@ export interface Permission {
 
 
 export enum ActivityStatus {
-    PROSPECT,           // Activity is in the prospect sate
+    PROSPECT,           // Activity is in the prospect state
     LEAD,               // Activity is in the lead state
     TO_BE_SCHEDULED,    // Activity is marked "sold" and is to be scheduled by the office manager
     SCHEDULED,          // The Activity is scheduled and ready for installation
     INSTALL,            // The Activity is currently being installed
     SERVICE_CALL,       // Activity is a service call
     FINAL_PAPERWORK,    // The Installation is complete and the final office paperwork is to be completed
-    ARCHIVE             // The activity is archived
+    ARCHIVE             // The Activity is archived
 }
 
 export enum UserStatus {
