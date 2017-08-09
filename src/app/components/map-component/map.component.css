@@ -1,3 +1,8 @@
+#mapParent
+{
+    height: 450px;
+    width: 65%;
+}
 #map
 {
     height: 450px;
@@ -547,26 +552,6 @@ button.aspNetDisabled
 .button-gray:hover
 {
     background-color: #cedae7;
-    transition: background-color 0.25s;
-}
-.button-blue
-{
-    color: #ffffff;
-    font: normal 14px "Roboto";
-    text-transform: uppercase;
-    background-color: #00b2ee;
-    border-radius: 5px;
-    height: 40px;
-    padding: 0px 20px;
-    text-align: center;
-    vertical-align: middle;
-    border: none;
-    transition: background-color 0.25s;
-    cursor: pointer;
-}
-.button-blue:hover
-{
-    background-color: #0e96c4;
     transition: background-color 0.25s;
 }
 .button-green

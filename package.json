@@ -22,6 +22,7 @@
     "@angular/platform-browser-dynamic": "^4.2.4",
     "@angular/router": "^4.2.4",
     "@types/googlemaps": "^3.26.14",
+    "angular2-toaster": "^4.0.0",
     "core-js": "^2.4.1",
     "material-design-icons": "file:material-design-icons",
     "rxjs": "^5.1.0",
