@@ -49,22 +49,22 @@ export class MapComponent implements OnInit, AfterViewInit {
     // Load logged in user info from EasyDataTracker
     this.loggedInUser = this.getLoggedInUser();
   }
-  
+
 
 
   ngAfterViewInit() {
     var thisRef = this;
     window.addEventListener('message', thisRef.handleParentMessages, false);
-    window.parent.postMessage({
-      "eventType": "AppLoaded"
-    }, '*');
-
+      console.log("Send to Parent: AppLoaded");
+      window.parent.postMessage({
+        "eventType": "AppLoaded"
+      }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
   }
 
 
   getLoggedInUser(): User {
     // TODO grab real info from EASYDATATRACKER
-    var user = {
+    let user: User = {
       status: UserStatus.ENABLED,
       logonName: "testUser",
       permissions: [{
@@ -78,16 +78,25 @@ export class MapComponent implements OnInit, AfterViewInit {
 
 
   handleParentMessages(event) {
+    console.log("PARENT_MESSAGE: " + event.data.eventType);
+    console.log(event.data);
     switch (event.data.eventType) {
       case "InitialData":
+        var dataArray = event.data.data;
+        // TODO do the mapping
+
+        /*this.activities = dataArray.map((inputActivity) => {
+          let returnActivity: Activity;
+          return returnActivity;
+        });*/
+        console.log(dataArray);
         break;
-    }
-    console.log("PARENT_MESSAGE: " + event.data.eventType);
+    }    
   }
 
 
   initEasyDataMarkers() {
-    // TODO load Activities and Dispositions from EASYDATATRACKER
+    // TODO Create Marker Array from Activity Array
     this.markers = new Array<google.maps.Marker>();
   }
 
@@ -176,7 +185,11 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.markerInfoWindowContent = `
     <div>
      <button _ngcontent-c1 class="button-blue" title="Open Directions" id="openExternalMaps"><i class="material-icons">navigation</i></button>
+<<<<<<< HEAD
      <button _ngcontent-c1 class="button-blue" title="Disposition Info" id="dispositionInfo"><i class="material-icons">account_circle</i></button>
+=======
+     <button _ngcontent-c1 class="button-blue" title="Disposition Info" id="dispositionInfo"><i class="material-icons">person</i></button>
+>>>>>>> 4f7ea4e38df4d67ab8b09695cd7e87bd9bb6c8c9
      <button _ngcontent-c1 class="button-blue" title="Call Customer" id="callCustomer"><i class="material-icons">phone</i></button>
     </div>
     `;
@@ -201,39 +214,45 @@ export class MapComponent implements OnInit, AfterViewInit {
       status: ActivityStatus.LEAD,
       dispositionName: "testDisposition",
       dispositionColor: "000000",
-      notes: ""
+      notes: "",
+      latLng: new google.maps.LatLng(0,0) // TODO Get actual lat long from Marker
+    });
+
+    this.markers[this.markers.length - 1].addListener('click', function () {
+      var thisRef = this;
+      thisRef.lastSavedMarkerWindow(this.markers[this.markers.length - 1]);
     });
     //console.log(this.activities[this.activities.length - 1])
 
     // Clear the new marker content
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.close();
-    this.lastSavedMarkerWindow();
+    this.lastSavedMarkerWindow(this.markers[this.markers.length - 1]);
 
     // TODO Push the newest activity to the EasyDataTracker side
   }
 
-  openExternalMaps(){
+  openExternalMaps() {
     console.log("Set a default application for opening maps");
   }
-  dispositionInfo(){
+  dispositionInfo() {
     console.log("The Disposition window has not yet been set");
   }
-  callCustomer(){
+  callCustomer() {
     console.log("Set a default application for making phone calls");
   }
 
-  lastSavedMarkerWindow(){
+  lastSavedMarkerWindow(marker: google.maps.Marker) {
     this.markerInfowindow.setContent(this.markerInfoWindowContent);
-    this.markerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
+    this.markerInfowindow.open(this.map, marker);
     var thisRef = this;
     document.getElementById("openExternalMaps").addEventListener("click", function () {
       thisRef.openExternalMaps();
     });
-     document.getElementById("dispositionInfo").addEventListener("click", function () {
+    document.getElementById("dispositionInfo").addEventListener("click", function () {
       thisRef.dispositionInfo();
     });
-     document.getElementById("callCustomer").addEventListener("click", function () {
+    document.getElementById("callCustomer").addEventListener("click", function () {
       thisRef.callCustomer();
     });
   }
