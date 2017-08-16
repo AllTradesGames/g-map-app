@@ -12,7 +12,6 @@
   },
   "private": true,
   "dependencies": {
-<<<<<<< HEAD
     "@angular/animations": "^4.3.4",
     "@angular/common": "^4.3.4",
     "@angular/compiler": "^4.3.4",
@@ -26,23 +25,6 @@
     "core-js": "^2.5.0",
     "rxjs": "^5.4.3",
     "zone.js": "^0.8.16"
-=======
-    "@angular/animations": "^4.2.4",
-    "@angular/common": "^4.2.4",
-    "@angular/compiler": "^4.2.4",
-    "@angular/core": "^4.2.4",
-    "@angular/forms": "^4.2.4",
-    "@angular/http": "^4.2.4",
-    "@angular/platform-browser": "^4.2.4",
-    "@angular/platform-browser-dynamic": "^4.2.4",
-    "@angular/router": "^4.2.4",
-    "@types/googlemaps": "^3.26.14",
-    "angular2-toaster": "^4.0.0",
-    "core-js": "^2.4.1",
-    "material-design-icons": "file:material-design-icons",
-    "rxjs": "^5.1.0",
-    "zone.js": "^0.8.4"
->>>>>>> origin/master
   },
   "devDependencies": {
     "@angular/cli": "1.1.2",

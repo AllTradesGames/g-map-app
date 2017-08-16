@@ -28,10 +28,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
-<<<<<<< HEAD
   easyDataImgPath: string = "http://localhost:53312/WebApplication/img/";
-=======
->>>>>>> origin/master
   newMarkerAddress: string;
   markerAddress: string;
   clickedMarkerIndex: number;
@@ -151,10 +148,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.markers.push(new google.maps.Marker({
         position: latLong,
         map: this.map,
-<<<<<<< HEAD
         icon: this.easyDataImgPath + "newpin.png",
-=======
->>>>>>> origin/master
         animation: google.maps.Animation.DROP,
       }));
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
