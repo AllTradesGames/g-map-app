@@ -2,6 +2,8 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { } from '@types/googlemaps';
 import { FormsModule } from '@angular/forms';
 
+import { Observable } from 'rxjs/Rx';
+
 import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../../models';
 
 @Component({
@@ -11,7 +13,10 @@ import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../
 })
 export class MapComponent implements OnInit, AfterViewInit {
 
-  loggedInUser: User;
+  isTrackingUserLocation: boolean = false;
+  isLocationUpdated: boolean = false;
+  userLocationPin: google.maps.Marker;
+  loggedInUser: User = { status: UserStatus.ENABLED, logonName: "zach", permissions: [] }; // TODO remove this initialization later
   geocoder: google.maps.Geocoder;
   map: google.maps.Map;
   latLong: google.maps.LatLng = new google.maps.LatLng(39.5501, -105.7821);
@@ -23,9 +28,11 @@ export class MapComponent implements OnInit, AfterViewInit {
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
-  markerBeachFlag = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+  easyDataImgPath: string = "http://localhost:53312/WebApplication/img/";
   newMarkerAddress: string;
   markerAddress: string;
+  clickedMarkerIndex: number;
+
 
   constructor() { }
 
@@ -43,23 +50,16 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.map.addListener('click', function ($mapClick) {
       thisRef.onMapClick($mapClick);
     });
-    // Set the info window html content vars
+
+    // Set the infowindow html content vars
     this.initInfoWindowContent();
-    // Load and create markers from EasyDataTracker
-    this.initEasyDataMarkers();
-    // Load logged in user info from EasyDataTracker
-    this.loggedInUser = this.getLoggedInUser();
   }
 
 
 
   ngAfterViewInit() {
     var thisRef = this;
-    window.addEventListener('message', thisRef.handleParentMessages, false);
-      console.log("Send to Parent: AppLoaded");
-      window.parent.postMessage({
-        "eventType": "AppLoaded"
-      }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
+    window.addEventListener('message', thisRef.handleParentMessages.bind(this), false);
   }
 
 
@@ -79,36 +79,76 @@ export class MapComponent implements OnInit, AfterViewInit {
 
 
   handleParentMessages(event) {
-    console.log("PARENT_MESSAGE: " + event.data.eventType);
+    console.log("PARENT_MESSAGE: " + event.data.type);
     console.log(event.data);
-    switch (event.data.eventType) {
+    switch (event.data.type) {
+
+      case "webpackOk":
+        console.log("Send to Parent: AppLoaded");
+        window.parent.postMessage({
+          "type": "AppLoaded"
+        }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
+        break;
+
       case "InitialData":
         var dataArray = event.data.data;
-        // TODO do the mapping
-
-        /*this.activities = dataArray.map((inputActivity) => {
-          let returnActivity: Activity;
-          return returnActivity;
-        });*/
-        console.log(dataArray);
+        this.activities = dataArray.map((inputActivity) => {
+          return inputActivity;
+        });
+        this.initializeMarkers();
         break;
-    }    
+
+    }
   }
 
-
-  initEasyDataMarkers() {
-    // TODO Create Marker Array from Activity Array
+  // Creates the Marker array and fills it with Markers made from the Activity list
+  initializeMarkers() {
+    console.log("initializeMarkers()")
     this.markers = new Array<google.maps.Marker>();
+    for (let ii: number = 0; ii < this.activities.length; ii++) {
+      this.createMarkerFromActivity(ii);
+    }
+
+    // Sets the interval to update User location
+    Observable.interval(1000).subscribe(x => {
+      this.checkUserLocationCheckbox();
+    });
   }
 
+  // Creates a corresponding Marker for an Activity, given the Activity's index in the activities array
+  createMarkerFromActivity(index: number) {
+    this.geocoder.geocode({ 'address': this.activities[index].contactAddress }, (results, status) => {
+      if (status.toString() === 'OK') {
+        this.markers[index] = new google.maps.Marker({
+          position: results[0].geometry.location,
+          map: this.map,
+          icon: this.easyDataImgPath + this.activities[index].dispositionName.toLowerCase() + ".png",
+          title: this.activities[index].contactName,
+          clickable: true
+        });
+        var thisRef = this;
+        this.markers[index].addListener('click', function () {
+          //thisRef.clickedMarkerIndex = index;
+          thisRef.openMarkerInfowindow(index);
+          console.log("marker " + index + " clicked");
+        });
+      }
+      else {
+        console.log('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+    // TODO Set zoom so that all pins are in view
+    // TODO Set center of map at relative center to all pins
+  }
 
+  // Handles map clicks for creating a new pin
   onMapClick($mapClick) {
     if (this.isCreatingPin == true) {
       var latLong = new google.maps.LatLng($mapClick.latLng.lat(), $mapClick.latLng.lng());
       this.markers.push(new google.maps.Marker({
         position: latLong,
         map: this.map,
-        icon: this.markerBeachFlag,
+        icon: this.easyDataImgPath + "newpin.png",
         animation: google.maps.Animation.DROP,
       }));
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
@@ -123,6 +163,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // Calls "codeAddress" when the enter key is pressed
   keypressEvent(event) {
     var key = event.which || event.keyCode;
     if (key === 13) { // 13 is enter
@@ -130,7 +171,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     }
   }
 
-
+  // Geocodes the address in the search box and creates a new Marker for that address
   codeAddress() {
     var searchBoxEl: HTMLInputElement = <HTMLInputElement>document.getElementById("search-box");
     this.newMarkerAddress = searchBoxEl.value;
@@ -140,11 +181,12 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.newMarkerAddress = results[0].formatted_address;
         this.map.setCenter(results[0].geometry.location);
         // TODO make this zoom value dynamic based on the closest geocode result
-        this.map.setZoom(11);
+        this.map.setZoom(17);
         if (this.isCreatingPin) {
           this.markers.push(new google.maps.Marker({
             position: results[0].geometry.location,
-            map: this.map
+            map: this.map,
+            icon: this.easyDataImgPath + "newpin.png",
           }));
           this.newMarkerWindowContent();
         }
@@ -161,7 +203,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
     var thisRef = this;
     document.getElementById("newMarkerSave").addEventListener("click", function () {
-      thisRef.newMarkerSave();
+      thisRef.newMarkerSave(thisRef.markers.length - 1);
     });
     var newMarkerAddressEl: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
     newMarkerAddressEl.value = thisRef.newMarkerAddress;
@@ -173,85 +215,148 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   initInfoWindowContent() {
     this.newMarkerInfoWindowContent = `
-    <div>
-      <input _ngcontent-c1 id="newMarkerName" title="New Customer Name" type="text" placeholder="Name">
-      <input _ngcontent-c1 id="newMarkerAddress" title="New Customer Address" type="text" placeholder="Address" value="">
-      <input _ngcontent-c1 id="newMarkerPhone" title="New Customer Phone Number" type="text" placeholder="Phone Number">
-      <input _ngcontent-c1 id="newMarkerEmail" title="New Customer Email Address" type="text" placeholder="Email (optional)">
-    </div>
-    <div>
-      <button _ngcontent-c1 class="button-blue" title="Save" id="newMarkerSave"><i class="material-icons">save</i></button>
+    <div id="newMarkerInfoWindow">
+      <!--<input _ngcontent-c1 id="newMarkerName" title="New Customer Name" type="text" placeholder="Name"></br>-->
+      <input _ngcontent-c1 id="newMarkerAddress" title="New Customer Address" type="text" placeholder="Address" value=""></br>
+      <select _ngcontent-c1 id="newMarkerDisposition" title="New Customer Disposition">
+        <option value="Not Set" selected="selected">Not Set</option>
+        <option value="Appt Set">Appt Set</option>
+        <option value="Moved In">Moved In</option>
+        <option value="Followup Call">Followup Call</option>
+        <option value="Jump Appt">Jump Appt</option>
+      </select>
+      <!--<input _ngcontent-c1 id="newMarkerPhone" title="New Customer Phone Number" type="text" placeholder="Phone Number">-->
+      <!--<input _ngcontent-c1 id="newMarkerEmail" title="New Customer Email Address" type="text" placeholder="Email (optional)">-->
+      <button _ngcontent-c1 style="float: right" class="button-blue" title="Save" id="newMarkerSave"><i class="material-icons">save</i></button>
     </div>
     `;
 
     this.markerInfoWindowContent = `
     <div>
      <button _ngcontent-c1 class="button-blue" title="Open Directions" id="openExternalMaps"><i class="material-icons">navigation</i></button>
-     <button _ngcontent-c1 class="button-blue" title="Disposition Info" id="dispositionInfo"><i class="material-icons">person</i></button>
+     <button _ngcontent-c1 class="button-blue" title="Customer Info" id="dispositionInfo"><i class="material-icons">person</i></button>
      <button _ngcontent-c1 class="button-blue" title="Call Customer" id="callCustomer"><i class="material-icons">phone</i></button>
     </div>
     `;
   }
 
-
-  newMarkerSave() {
-    var nameField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
+  // Takes info entered by user in the newMarkerInfoWindowContent and creates a new activity
+  newMarkerSave(index) {
+    //var nameField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
     var addressField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
-    var phoneField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerPhone");
-    var emailField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerEmail");
+    var dispositionField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerDisposition");
+    //var phoneField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerPhone");
+    //var emailField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerEmail");
 
-    // Add a new Activity to the activities array
     this.activities.push({
       id: -1,
       ownerName: this.loggedInUser.logonName,
-      contactName: nameField.value,
+      contactName: "",//nameField.value,
       contactAddress: addressField.value,
-      contactEmail: emailField.value,
-      contactPhones: [phoneField.value],
+      contactEmail: "",//emailField.value,
+      contactPhones: [],//[phoneField.value],
       leadType: "testLead",
       status: ActivityStatus.LEAD,
-      dispositionName: "testDisposition",
-      dispositionColor: "000000",
+      dispositionName: "Not Set",
       notes: "",
-      latLng: new google.maps.LatLng(0,0) // TODO Get actual lat long from Marker
+      latLng: new google.maps.LatLng(0, 0) // TODO Get actual lat long from Marker
     });
-
-    this.markers[this.markers.length - 1].addListener('click', function () {
-      var thisRef = this;
-      thisRef.lastSavedMarkerWindow(this.markers[this.markers.length - 1]);
+    var thisRef = this;
+    this.markers[index].addListener('click', function () {
+      thisRef.openMarkerInfowindow(index);
     });
     //console.log(this.activities[this.activities.length - 1])
 
     // Clear the new marker content
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.close();
-    this.lastSavedMarkerWindow(this.markers[this.markers.length - 1]);
+    this.openMarkerInfowindow(index);
 
     // TODO Push the newest activity to the EasyDataTracker side
   }
 
-  openExternalMaps() {
-    console.log("Set a default application for opening maps");
+  openExternalMaps(index: number) {
+    window.open("google.navigation:q=" + this.markers[index].getPosition().lat() + "," + this.markers[index].getPosition().lng());
+    console.log("Navigating to : " + this.markers[index].getPosition().lat() + "," + this.markers[index].getPosition().lng());
   }
-  dispositionInfo() {
-    console.log("The Disposition window has not yet been set");
+  dispositionInfo(index: number) {
+    window.parent.location.href = "http://localhost:53312/WebApplication/SalesManageActivity.aspx?id=" + this.activities[index].id;
   }
-  callCustomer() {
-    console.log("Set a default application for making phone calls");
+  callCustomer(index: number) {
+    if (this.activities[index].contactPhones[0] != null) {
+      window.open("tel:" + this.activities[index].contactPhones[0]);
+      console.log("Calling : " + this.activities[index].contactPhones[0]);
+    }
   }
 
-  lastSavedMarkerWindow(marker: google.maps.Marker) {
+  openMarkerInfowindow(index: number) {
     this.markerInfowindow.setContent(this.markerInfoWindowContent);
-    this.markerInfowindow.open(this.map, marker);
+    this.markerInfowindow.open(this.map, this.markers[index]);
     var thisRef = this;
     document.getElementById("openExternalMaps").addEventListener("click", function () {
-      thisRef.openExternalMaps();
+      thisRef.openExternalMaps(index);
     });
     document.getElementById("dispositionInfo").addEventListener("click", function () {
-      thisRef.dispositionInfo();
+      thisRef.dispositionInfo(index);
     });
     document.getElementById("callCustomer").addEventListener("click", function () {
-      thisRef.callCustomer();
+      thisRef.callCustomer(index);
     });
   }
+
+  updateUserLocation(thisRef: any) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        if (!thisRef.isLocationUpdated) {
+          thisRef.map.setCenter(pos);
+          thisRef.map.setZoom(17);
+          thisRef.isLocationUpdated = true;
+        }
+        if (thisRef.userLocationPin) {
+          thisRef.userLocationPin.setPosition(pos);
+        }
+        else {
+          thisRef.userLocationPin = new google.maps.Marker({
+            position: pos,
+            map: thisRef.map,
+            icon: thisRef.easyDataImgPath + "user dot.png"
+          })
+        }
+      }, function () {
+        thisRef.handleLocationError(true, thisRef);
+      });
+    } else {
+      // Browser doesn't support Geolocation
+      thisRef.handleLocationError(false, thisRef);
+    }
+  }
+
+  handleLocationError(browserHasGeolocation, thisRef) {
+    window.alert(browserHasGeolocation ?
+      'Error: The Geolocation service failed.' :
+      'Error: Your browser doesn\'t support geolocation.');
+    thisRef.isTrackingUserLocation = false;
+  }
+
+  checkUserLocationCheckbox() {
+    if (this.isTrackingUserLocation) {
+      if (this.userLocationPin && (this.userLocationPin.getMap() == null)) {
+        this.userLocationPin.setMap(this.map);
+      }
+      this.updateUserLocation(this);
+    }
+    else if (this.userLocationPin) {
+      this.userLocationPin.setMap(null);
+      this.isLocationUpdated = false;
+    }
+  }
+
+  userLocationCheckboxChange() {
+    this.checkUserLocationCheckbox();
+  }
+
 }

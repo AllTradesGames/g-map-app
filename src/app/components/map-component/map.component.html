@@ -18,5 +18,11 @@
       <div class="slider round"></div>
       </label><i class="material-icons" style="color: #00b2ee; font-size: 32px;">add_location</i>
     </div>
+    <div id="userLocation-panel">
+      <label class="switch">
+      <input type="checkbox" [(ngModel)]="this.isTrackingUserLocation" (ngModelChange)="userLocationCheckboxChange()">
+      <div class="slider round"></div>
+      </label><i class="material-icons" style="color: #00b2ee; font-size: 32px;">my_location</i>
+    </div>
   </body>
 </html>

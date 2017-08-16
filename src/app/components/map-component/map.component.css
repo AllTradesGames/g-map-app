@@ -797,3 +797,27 @@ button.aspNetDisabled
         padding-left: 10px;
         padding-right: 10px;
       }
+    
+#userLocation-panel {
+    position: absolute;
+    top: 50px;
+    right: 2%;
+    z-index: 5;
+    background-color: transparent;
+    padding: 5px;
+    border: 0px solid #999;
+    text-align: center;
+    font-family: 'Roboto','sans-serif';
+    line-height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  #newMarkerInfoWindow {
+      width: 250px;
+  }
+
+  #newMarkerAddress {
+      width: 200px;
+      margin-bottom: 5px;
+  }

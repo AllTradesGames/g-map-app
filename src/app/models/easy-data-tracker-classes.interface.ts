@@ -8,7 +8,7 @@ export interface Activity {
     leadType: string;
     status: ActivityStatus;
     dispositionName: string;
-    dispositionColor: string;
+    //dispositionColor: string; // Used if color is set by EasyDataTracker
     notes: string;
     latLng: google.maps.LatLng;
 }
