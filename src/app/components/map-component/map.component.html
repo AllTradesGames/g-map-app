@@ -1,23 +1,18 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>
-    </title>
-  </head>
-  <body>
+  <div id="mapParent">
     <div id="placesSearch-panel">
       <input style="width: 300px !important" id="search-box" title="Search for an Address" [(ngModel)]="address" type="text" placeholder="Search . . ." (keypress)="keypressEvent($event)">
-      <button title="Search Address" value="Search" (click)="codeAddress()" class="button-blue">
-      <i class="material-icons dp48">search</i>
+      <button title="Click to Search an Address" value="Search" (click)="codeAddress()" class="button-blue">
+      <i class="material-icons">search</i>
       </button>
     </div>
     <div id="map"></div>
     <div id="newMarker-panel">
-      <label class="switch">
+      <label class="switch" title="Create New Pin">
       <input type="checkbox" [(ngModel)]="this.isCreatingPin">
       <div class="slider round"></div>
-      </label><i class="material-icons" style="color: #00b2ee; font-size: 32px;">add_location</i>
+      </label><i class="material-icons" style="color: #00b2ee; font-size: 32px;" title="Create New Pin Icon">add_location</i>
     </div>
+<<<<<<< HEAD
     <div id="userLocation-panel">
       <label class="switch">
       <input type="checkbox" [(ngModel)]="this.isTrackingUserLocation" (ngModelChange)="userLocationCheckboxChange()">
@@ -26,3 +21,6 @@
     </div>
   </body>
 </html>
+=======
+  </div>
+>>>>>>> origin/master

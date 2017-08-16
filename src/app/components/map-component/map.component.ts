@@ -9,7 +9,7 @@ import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../
 @Component({
   selector: 'map-component',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css', '../../app.component.css']
 })
 export class MapComponent implements OnInit, AfterViewInit {
 
@@ -28,7 +28,10 @@ export class MapComponent implements OnInit, AfterViewInit {
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
+<<<<<<< HEAD
   easyDataImgPath: string = "http://localhost:53312/WebApplication/img/";
+=======
+>>>>>>> origin/master
   newMarkerAddress: string;
   markerAddress: string;
   clickedMarkerIndex: number;
@@ -148,7 +151,10 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.markers.push(new google.maps.Marker({
         position: latLong,
         map: this.map,
+<<<<<<< HEAD
         icon: this.easyDataImgPath + "newpin.png",
+=======
+>>>>>>> origin/master
         animation: google.maps.Animation.DROP,
       }));
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
@@ -234,7 +240,15 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.markerInfoWindowContent = `
     <div>
      <button _ngcontent-c1 class="button-blue" title="Open Directions" id="openExternalMaps"><i class="material-icons">navigation</i></button>
+<<<<<<< HEAD
      <button _ngcontent-c1 class="button-blue" title="Customer Info" id="dispositionInfo"><i class="material-icons">person</i></button>
+=======
+<<<<<<< HEAD
+     <button _ngcontent-c1 class="button-blue" title="Disposition Info" id="dispositionInfo"><i class="material-icons">account_circle</i></button>
+=======
+     <button _ngcontent-c1 class="button-blue" title="Disposition Info" id="dispositionInfo"><i class="material-icons">person</i></button>
+>>>>>>> 4f7ea4e38df4d67ab8b09695cd7e87bd9bb6c8c9
+>>>>>>> origin/master
      <button _ngcontent-c1 class="button-blue" title="Call Customer" id="callCustomer"><i class="material-icons">phone</i></button>
     </div>
     `;
