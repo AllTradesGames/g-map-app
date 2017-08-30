@@ -8,12 +8,16 @@ export interface Activity {
     leadType: string;
     status: ActivityStatus;
     dispositionName: string;
+    dispositionId: number;
     //dispositionColor: string; // Used if color is set by EasyDataTracker
     notes: string;
-    latLng: google.maps.LatLng;
+    //latLng: google.maps.LatLng;
+    latitude: number;
+    longitude: number;
 }
 
 export interface User {
+    id: number;
     status: UserStatus;
     logonName: string;
     permissions: Permission[];
