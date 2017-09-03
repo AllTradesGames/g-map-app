@@ -13,6 +13,7 @@ import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../
 })
 export class MapComponent implements OnInit, AfterViewInit {
 
+  isMobileDevice: boolean = false;
   isTrackingUserLocation: boolean = false;
   isLocationUpdated: boolean = false;
   userLocationPin: google.maps.Marker;
@@ -31,7 +32,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   easyDataImgPath: string = "http://localhost:53312/WebApplication/img/";
   newMarkerAddress: string;
   markerAddress: string;
-  clickedMarkerIndex: number;
+  clickedMarkerIndex: number = -1;;
 
   infoPanelPinImg: string;
 
@@ -62,6 +63,15 @@ export class MapComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     var thisRef = this;
     window.addEventListener('message', thisRef.handleParentMessages.bind(this), false);
+    this.isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Add Event listener to new marker info windo 'X' Button
+    google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
+      console.log("Before: " + thisRef.markers.length);
+      thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
+      thisRef.markers.pop(); //removes the marker from array
+      console.log("After: " + thisRef.markers.length);
+    });
   }
 
 
@@ -102,10 +112,23 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.createMarkerFromActivity(ii);
     }
 
-    // Sets the interval to update User location
-    Observable.interval(1000).subscribe(x => {
+    this.setUserLocUpdateInterval(1000);
+  }
+
+
+  setUserLocUpdateInterval(interval: number) {
+    Observable.interval(interval).subscribe(x => {
       this.checkUserLocationCheckbox();
     });
+  }
+
+
+  zoomToFitMarkers(markers: google.maps.Marker[]) {
+    var bounds = new google.maps.LatLngBounds();
+    for (let marker of markers) {
+      bounds.extend(marker.getPosition());
+    }
+    this.map.fitBounds(bounds);
   }
 
 
@@ -122,17 +145,24 @@ export class MapComponent implements OnInit, AfterViewInit {
         });
         var thisRef = this;
         this.markers[index].addListener('click', function () {
-          //thisRef.clickedMarkerIndex = index;
+          thisRef.clickedMarkerIndex = index;
           thisRef.openMarkerInfowindow(index);
           console.log("marker " + index + " clicked");
         });
+        // If this is the last marker, zoom the map to fit all the markers
+        if (index == this.activities.length - 1) {
+          this.zoomToFitMarkers(this.markers);
+        }
       }
       else {
         console.log('Geocode was not successful for the following reason: ' + status);
+        if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
+          setTimeout(function (thisRef, inputIndex) {
+            thisRef.createMarkerFromActivity(inputIndex);
+          }, 1010, this, index);
+        }
       }
     });
-    // TODO Set zoom so that all pins are in view
-    // TODO Set center of map at relative center to all pins
   }
 
 
@@ -156,6 +186,8 @@ export class MapComponent implements OnInit, AfterViewInit {
       });
       this.isCreatingPin = false;
     }
+    this.markerInfowindow.close();
+    this.clickedMarkerIndex = -1;
   }
 
 
@@ -200,14 +232,10 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.newMarkerInfowindow.open(this.map, this.markers[this.markers.length - 1]);
     var thisRef = this;
     document.getElementById("newMarkerSave").addEventListener("click", function () {
-      thisRef.newMarkerSave(thisRef.markers.length - 1);
+      thisRef.createActivity(thisRef.markers.length - 1);
     });
     var newMarkerAddressEl: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
     newMarkerAddressEl.value = thisRef.newMarkerAddress;
-    google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
-      thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
-      thisRef.markers.pop(); //removes the marker from array
-    });
   }
 
 
@@ -240,15 +268,15 @@ export class MapComponent implements OnInit, AfterViewInit {
 
 
   // Takes info entered by user in the newMarkerInfoWindowContent and creates a new activity
-  newMarkerSave(index) {
+  createActivity(index) {
     //var nameField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerName");
     var addressField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerAddress");
     let dispositionField: any = document.getElementById("newMarkerDisposition");
     //var phoneField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerPhone");
     //var emailField: HTMLInputElement = <HTMLInputElement>document.getElementById("newMarkerEmail");
 
-    this.markers[index].setIcon(this.easyDataImgPath + dispositionField.options[dispositionField.selectedIndex].text.toLowerCase() +".png");
-    
+    this.markers[index].setIcon(this.easyDataImgPath + dispositionField.options[dispositionField.selectedIndex].text.toLowerCase() + ".png");
+
     var newActivity = {
       id: -1,
       ownerName: this.loggedInUser.logonName,
@@ -287,17 +315,50 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.close();
     this.openMarkerInfowindow(index);
+  }
 
+
+  deleteActivity(index) {
+    this.markers[index].setMap(null);
+    this.markers.splice(index, 1);
+    this.activities.splice(index, 1);
+
+    // Send the new activity to the EasyDataTracker side
+    window.parent.postMessage({
+      "type": "DeleteActivity",
+      "data": this.activities[index].id
+    }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
+    console.log("Send Delete Activity (id:" + this.activities[index].id + ") Message to Server");
   }
 
 
   openExternalMaps(index: number) {
-    window.open("google.navigation:q=" + this.markers[index].getPosition().lat() + "," + this.markers[index].getPosition().lng());
+    var thisRef = this;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        // Open Google Maps navigation
+        window.open("https://google.com/maps/dir/?api=1&destination=" + thisRef.markers[index].getPosition().lat() + "," + thisRef.markers[index].getPosition().lng());
+      }, function () {
+        // User didn't allow Geolocation
+        thisRef.handleLocationError(true, thisRef);
+      });
+    } else {
+      // Browser doesn't support Geolocation
+      thisRef.handleLocationError(false, thisRef);
+    }
     console.log("Navigating to : " + this.markers[index].getPosition().lat() + "," + this.markers[index].getPosition().lng());
   }
+
+
   dispositionInfo(index: number) {
     window.parent.location.href = "http://localhost:53312/WebApplication/SalesManageActivity.aspx?id=" + this.activities[index].id;
   }
+
+
   callCustomer(index: number) {
     if (this.activities[index].contactPhones[0] != null) {
       window.open("tel:" + this.activities[index].contactPhones[0]);
@@ -323,8 +384,9 @@ export class MapComponent implements OnInit, AfterViewInit {
     document.getElementById("infoPanelName").innerHTML = thisRef.activities[index].contactName;
     document.getElementById("infoPanelAddress").innerHTML = thisRef.activities[index].contactAddress;
     document.getElementById("infoPanelDisposition").innerHTML = thisRef.activities[index].dispositionName;
-    thisRef.infoPanelPinImg = thisRef.easyDataImgPath + thisRef.activities[index].dispositionName.toLowerCase() + ".png" 
+    thisRef.infoPanelPinImg = thisRef.easyDataImgPath + thisRef.activities[index].dispositionName.toLowerCase() + ".png"
   }
+
 
   updateUserLocation(thisRef: any) {
     if (navigator.geolocation) {

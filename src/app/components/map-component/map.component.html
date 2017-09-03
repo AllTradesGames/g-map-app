@@ -19,7 +19,7 @@
       </label><i class="material-icons" style="color: #00b2ee; font-size: 32px;">my_location</i>
     </div>
 </div>
-<div id="infoPanelParent" style="display:inline-block; width: 17%; vertical-align:top; margin-left: 5px;">
+<div id="infoPanelParent" [hidden]="clickedMarkerIndex == -1" style="display:inline-block; width: 17%; vertical-align:top; margin-left: 5px;">
   <fieldset style="width: 84%">
     <legend class="window-section-top">
       <img [src]="infoPanelPinImg" style="height: 35px; display: inline-block; margin: 0px 6px -9px -17px;">
