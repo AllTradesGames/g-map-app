@@ -756,8 +756,7 @@ button.aspNetDisabled
 #placesSearch-panel {
         position: absolute;
         top: 10px;
-        left: 2%;
-        right: 16%;
+        left: 23%;
         z-index: 5;
         background-color: transparent;
         padding: 5px;
@@ -771,7 +770,7 @@ button.aspNetDisabled
 #newMarker-panel {
         position: absolute;
         top: 10px;
-        right: 18%;
+        right: 24%;
         z-index: 5;
         background-color: transparent;
         padding: 5px;
@@ -786,7 +785,7 @@ button.aspNetDisabled
 #userLocation-panel {
     position: absolute;
     top: 50px;
-    right: 18%;
+    right: 24%;
     z-index: 5;
     background-color: transparent;
     padding: 5px;
@@ -800,6 +799,10 @@ button.aspNetDisabled
 
   #newMarkerInfoWindow {
       width: 250px;
+  }
+  #newMarkerInfoWindow label {
+    font: bold 12px "Roboto";
+    color: #00a3da;
   }
 
   #newMarkerAddress {
@@ -828,4 +831,36 @@ button.aspNetDisabled
   [hidden] 
   { 
     display: none !important;
+  }
+
+  #infoPanelParent {
+    display:inline-block; 
+    width: 22%; 
+    vertical-align:top; 
+    margin: 0px 5px;
+    box-shadow:  12px 5px 10px #888888;
+  }
+  #infoPanelParent fieldset {
+    margin-bottom: 0;
+    width: 86%;
+    font: normal 1.3vw "Roboto";
+    color: #5e7387;
+  }
+  #infoPanelParent fieldset label {
+    font: bold 12px "Roboto";
+    color: #00a3da;
+    margin: 0;
+    position: relative;
+    top: -15px;
+    left: -7px;
+  }
+  #infoPanelName {
+      width: 85%;
+      font-size: 20px;
+  }
+  #infoPanelAddress {
+      margin: -15px 5px 20px 5px;
+  }
+  #infoPanelDisposition {
+    margin: -15px 5px -8px 5px;
   }

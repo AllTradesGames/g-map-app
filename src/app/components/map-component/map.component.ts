@@ -1,5 +1,8 @@
+declare var MarkerClusterer: any;
+
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { } from '@types/googlemaps';
+import '../../../assets/utilities/marker-clusterer.js'
 import { FormsModule } from '@angular/forms';
 
 import { Observable } from 'rxjs/Rx';
@@ -12,7 +15,7 @@ import { Pin, Activity, ActivityStatus, User, UserStatus, Permission } from '../
   styleUrls: ['./map.component.css', '../../app.component.css']
 })
 export class MapComponent implements OnInit, AfterViewInit {
-
+  isProduction: boolean = false;
   isMobileDevice: boolean = false;
   isTrackingUserLocation: boolean = false;
   isLocationUpdated: boolean = false;
@@ -29,13 +32,15 @@ export class MapComponent implements OnInit, AfterViewInit {
   newMarkerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
   markerInfoWindowContent: string;
   markerInfowindow: google.maps.InfoWindow = new google.maps.InfoWindow();
-  easyDataImgPath: string = "http://localhost:53312/WebApplication/img/";
+  easyDataParentPath: string = this.isProduction ? "https://www.abpworkspace.com" : "http://localhost:60385";
+  easyDataImgPath: string = this.isProduction ? "https://www.abpworkspace.com/img/" : "http://localhost:60385/WebApplication/img/";
   newMarkerAddress: string;
   markerAddress: string;
   clickedMarkerIndex: number = -1;;
 
   infoPanelPinImg: string;
 
+  markerClusterer: any;
 
   constructor() { }
 
@@ -65,27 +70,34 @@ export class MapComponent implements OnInit, AfterViewInit {
     window.addEventListener('message', thisRef.handleParentMessages.bind(this), false);
     this.isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+    if (!this.isProduction) {
+      console.log("Send to Parent: AppLoaded");
+    }
+
+    window.parent.postMessage({
+      "type": "AppLoaded"
+    }, this.easyDataParentPath);
+
     // Add Event listener to new marker info windo 'X' Button
     google.maps.event.addListener(thisRef.newMarkerInfowindow, 'closeclick', function () {
-      console.log("Before: " + thisRef.markers.length);
+      if (!this.isProduction) {
+        console.log("Before: " + thisRef.markers.length);
+      }
       thisRef.markers[thisRef.markers.length - 1].setMap(null); //removes the marker from map
       thisRef.markers.pop(); //removes the marker from array
-      console.log("After: " + thisRef.markers.length);
+      if (!this.isProduction) {
+        console.log("After: " + thisRef.markers.length);
+      }
     });
   }
 
 
   handleParentMessages(event) {
-    console.log("PARENT_MESSAGE: " + event.data.type);
-    console.log(event.data);
+    if (!this.isProduction) {
+      console.log("PARENT_MESSAGE: " + event.data.type);
+      console.log(event.data);
+    }
     switch (event.data.type) {
-
-      case "webpackOk":
-        console.log("Send to Parent: AppLoaded");
-        window.parent.postMessage({
-          "type": "AppLoaded"
-        }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
-        break;
 
       case "InitialActivities":
         var dataArray = event.data.data;
@@ -97,16 +109,25 @@ export class MapComponent implements OnInit, AfterViewInit {
 
       case "InitialUser":
         this.loggedInUser = event.data.data;
-        console.log(this.loggedInUser.logonName + " is logged in.");
+        if (!this.isProduction) {
+          console.log(this.loggedInUser.logonName + " is logged in.");
+        }
         break;
 
+      case "NewActID":
+        if (!this.isProduction) {
+          console.log("Received new act id: " + event.data + "from parent");
+        }
+        break;
     }
   }
 
 
   // Creates the Marker array and fills it with Markers made from the Activity list
   initializeMarkers() {
-    console.log("initializeMarkers()")
+    if (!this.isProduction) {
+      console.log("initializeMarkers()");
+    }
     this.markers = new Array<google.maps.Marker>();
     for (let ii: number = 0; ii < this.activities.length; ii++) {
       this.createMarkerFromActivity(ii);
@@ -126,7 +147,8 @@ export class MapComponent implements OnInit, AfterViewInit {
   zoomToFitMarkers(markers: google.maps.Marker[]) {
     var bounds = new google.maps.LatLngBounds();
     for (let marker of markers) {
-      bounds.extend(marker.getPosition());
+      if (marker)
+        bounds.extend(marker.getPosition());
     }
     this.map.fitBounds(bounds);
   }
@@ -147,19 +169,26 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.markers[index].addListener('click', function () {
           thisRef.clickedMarkerIndex = index;
           thisRef.openMarkerInfowindow(index);
-          console.log("marker " + index + " clicked");
+          if (!this.isProduction) {
+            console.log("marker " + index + " clicked");
+          }
         });
         // If this is the last marker, zoom the map to fit all the markers
         if (index == this.activities.length - 1) {
           this.zoomToFitMarkers(this.markers);
+
+          // TODO Initialize the marker clusterer
+          //this.markerClusterer = new MarkerClusterer(this.map, this.markers, {imagePath: this.easyDataImgPath + 'cluster'});
         }
       }
       else {
-        console.log('Geocode was not successful for the following reason: ' + status);
+        if (!this.isProduction) {
+          console.log('Geocode was not successful for the following reason: ' + status);
+        }
         if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
           setTimeout(function (thisRef, inputIndex) {
             thisRef.createMarkerFromActivity(inputIndex);
-          }, 1010, this, index);
+          }, 1100, this, index);
         }
       }
     });
@@ -169,15 +198,15 @@ export class MapComponent implements OnInit, AfterViewInit {
   // Handles map clicks for creating a new pin
   onMapClick($mapClick) {
     if (this.isCreatingPin == true) {
-      var latLong = new google.maps.LatLng($mapClick.latLng.lat(), $mapClick.latLng.lng());
-      this.markers.push(new google.maps.Marker({
-        position: latLong,
-        map: this.map,
-        icon: this.easyDataImgPath + "newpin.png",
-        animation: google.maps.Animation.DROP,
-      }));
       this.geocoder.geocode({ 'location': $mapClick.latLng }, (results, status) => {
         if (status.toString() === 'OK') {
+          var latLong = new google.maps.LatLng($mapClick.latLng.lat(), $mapClick.latLng.lng());
+          this.markers.push(new google.maps.Marker({
+            position: latLong,
+            map: this.map,
+            icon: this.easyDataImgPath + "newpin.png",
+            animation: google.maps.Animation.DROP,
+          }));
           this.newMarkerAddress = results[0].formatted_address;
           this.newMarkerWindowContent();
         } else {
@@ -243,13 +272,18 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.newMarkerInfoWindowContent = `
     <div id="newMarkerInfoWindow">
       <!--<input _ngcontent-c1 id="newMarkerName" title="New Customer Name" type="text" placeholder="Name"></br>-->
+      <label style="font: bold 14px 'Roboto'; color: #00a3da;">Address: </label>
       <input _ngcontent-c1 id="newMarkerAddress" title="New Customer Address" type="text" placeholder="Address" value=""></br>
+      <label style="font: bold 14px 'Roboto'; color: #00a3da;">Disposition: </label>
       <select _ngcontent-c1 id="newMarkerDisposition" title="New Customer Disposition">
-        <option value="1" selected="selected">Not Set</option>
         <option value="9">Appt Set</option>
-        <option value="7">Moved In</option>
         <option value="41">Followup Call</option>
-        <option value="69">Jump Appt</option>
+        <option value="44">New Build</option>
+        <option value="1" selected="selected">Not Set</option>
+        <option value="8">NMI</option>
+        <option value="16">No Show</option>
+        <option value="7">Moved In</option>
+        <option value="15">Visit</option>    
       </select>
       <!--<input _ngcontent-c1 id="newMarkerPhone" title="New Customer Phone Number" type="text" placeholder="Phone Number">-->
       <!--<input _ngcontent-c1 id="newMarkerEmail" title="New Customer Email Address" type="text" placeholder="Email (optional)">-->
@@ -260,7 +294,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.markerInfoWindowContent = `
     <div>
      <button _ngcontent-c1 class="button-blue" title="Open Directions" id="openExternalMaps"><i class="material-icons">navigation</i></button>
-     <button _ngcontent-c1 class="button-blue" title="Customer Info" id="dispositionInfo"><i class="material-icons">person</i></button>
+     <button _ngcontent-c1 class="button-blue" title="Customer Info" id="customerInfo"><i class="material-icons">person</i></button>
      <button _ngcontent-c1 class="button-blue" title="Call Customer" id="callCustomer"><i class="material-icons">phone</i></button>
     </div>
     `;
@@ -300,21 +334,22 @@ export class MapComponent implements OnInit, AfterViewInit {
     window.parent.postMessage({
       "type": "SaveActivity",
       "data": JSON.stringify(newActivity)
-    }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
-    console.log("Send Activity to Server");
-    console.log(newActivity);
+    }, this.easyDataParentPath);
+    if (!this.isProduction) {
+      console.log("Send Activity to Server");
+      console.log(newActivity);
+    }
 
-
-    var thisRef = this;
+    /*var thisRef = this;
     this.markers[index].addListener('click', function () {
       thisRef.openMarkerInfowindow(index);
+      // TODO BUGFIX
     });
-    //console.log(this.activities[this.activities.length - 1])
 
     // Clear the new marker content
     this.newMarkerInfowindow.setContent(this.newMarkerInfoWindowContent);
     this.newMarkerInfowindow.close();
-    this.openMarkerInfowindow(index);
+    this.openMarkerInfowindow(index);*/
   }
 
 
@@ -327,8 +362,10 @@ export class MapComponent implements OnInit, AfterViewInit {
     window.parent.postMessage({
       "type": "DeleteActivity",
       "data": this.activities[index].id
-    }, '*'); // TODO (SECURITY) Change '*' to actual domain name of final site
-    console.log("Send Delete Activity (id:" + this.activities[index].id + ") Message to Server");
+    }, this.easyDataParentPath);
+    if (!this.isProduction) {
+      console.log("Send Delete Activity (id:" + this.activities[index].id + ") Message to Server");
+    }
   }
 
 
@@ -350,19 +387,25 @@ export class MapComponent implements OnInit, AfterViewInit {
       // Browser doesn't support Geolocation
       thisRef.handleLocationError(false, thisRef);
     }
-    console.log("Navigating to : " + this.markers[index].getPosition().lat() + "," + this.markers[index].getPosition().lng());
+    if (!this.isProduction) {
+      console.log("Navigating to : " + this.markers[index].getPosition().lat() + "," + this.markers[index].getPosition().lng());
+    }
   }
 
 
-  dispositionInfo(index: number) {
-    window.parent.location.href = "http://localhost:53312/WebApplication/SalesManageActivity.aspx?id=" + this.activities[index].id;
+  customerInfo(index: number) {
+    if (this.activities[index].id > -1) {
+      window.parent.location.href = this.easyDataParentPath + (this.isProduction ? "" : "/WebApplication") + "/SalesManageActivity.aspx?id=" + this.activities[index].id;
+    }
   }
 
 
   callCustomer(index: number) {
     if (this.activities[index].contactPhones[0] != null) {
       window.open("tel:" + this.activities[index].contactPhones[0]);
-      console.log("Calling : " + this.activities[index].contactPhones[0]);
+      if (!this.isProduction) {
+        console.log("Calling : " + this.activities[index].contactPhones[0]);
+      }
     }
   }
 
@@ -374,8 +417,8 @@ export class MapComponent implements OnInit, AfterViewInit {
     document.getElementById("openExternalMaps").addEventListener("click", function () {
       thisRef.openExternalMaps(index);
     });
-    document.getElementById("dispositionInfo").addEventListener("click", function () {
-      thisRef.dispositionInfo(index);
+    document.getElementById("customerInfo").addEventListener("click", function () {
+      thisRef.customerInfo(index);
     });
     document.getElementById("callCustomer").addEventListener("click", function () {
       thisRef.callCustomer(index);

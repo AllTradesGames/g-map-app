@@ -5,14 +5,12 @@ import { HttpModule, JsonpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { MapComponent } from './components';
-import { InfoPanelComponent } from './components';
 import { GoogleMapsGeocodingService } from './services';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MapComponent,
-    InfoPanelComponent
+    MapComponent
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,6 @@
-<div id="mapParent" style="display:inline-block; width: 82%; vertical-align:top;">
+<div id="mapParent" style="display:inline-block; width: 76%; vertical-align:top;">
     <div id="placesSearch-panel">
-      <input style="width: 300px !important" id="search-box" title="Search for an Address" [(ngModel)]="address" type="text" placeholder="Search . . ." (keypress)="keypressEvent($event)">
+      <input style="width: 300px !important" id="search-box" title="Search for an Address" type="text" placeholder="Search . . ." (keypress)="keypressEvent($event)">
       <button title="Click to Search an Address" value="Search" (click)="codeAddress()" class="button-blue">
       <i class="material-icons">search</i>
       </button>
@@ -19,13 +19,15 @@
       </label><i class="material-icons" style="color: #00b2ee; font-size: 32px;">my_location</i>
     </div>
 </div>
-<div id="infoPanelParent" [hidden]="clickedMarkerIndex == -1" style="display:inline-block; width: 17%; vertical-align:top; margin-left: 5px;">
-  <fieldset style="width: 84%">
+<div id="infoPanelParent" [hidden]="clickedMarkerIndex == -1">
+  <fieldset>
     <legend class="window-section-top">
       <img [src]="infoPanelPinImg" style="height: 35px; display: inline-block; margin: 0px 6px -9px -17px;">
       <p id="infoPanelName" class="window-section-header" style="padding: 0;"></p>
     </legend>
+    <label>Address: </label>
     <p id="infoPanelAddress"></p>
+    <label>Disposition: </label>
     <p id="infoPanelDisposition"></p>
   </fieldset>
 </div>
